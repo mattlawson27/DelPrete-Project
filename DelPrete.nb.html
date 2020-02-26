@@ -1749,21 +1749,32 @@ summary {
 
 
 <!-- rnb-text-begin -->
-<p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>
-<p>Try executing this chunk by clicking the <em>Run</em> button within the chunk or by placing your cursor inside it and pressing <em>Ctrl+Shift+Enter</em>.</p>
+<div id="section" class="section level1">
+<h1>02 24 2020</h1>
+<div id="loading-the-data" class="section level2">
+<h2>Loading the data</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGxvdChjYXJzKVxuYGBgIn0= -->
-<pre class="r"><code>plot(cars)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuRGVscHJldGUgPC0gcmVhZF9leGNlbChcIkRlbHByZXRlLnhsc3hcIilcblxuIyBDaGFuZ25pbmcgZGF0YSBpbnRvIGEgZGF0YSBmcmFtZVxuXG5EZWxwcmV0ZSA8LSBhcy5kYXRhLmZyYW1lKERlbHByZXRlKVxuXG5EZWxwcmV0ZSA8LSBzdWJzZXQoRGVscHJldGUsIENvbGxlY3Rpb25fbnVtYmVyICE9IDEpXG5EZWxwcmV0ZSA8LSBzdWJzZXQoRGVscHJldGUsIENvbGxlY3Rpb25fbnVtYmVyICE9IDIpXG5EZWxwcmV0ZSA8LSBzdWJzZXQoRGVscHJldGUsIENvbGxlY3Rpb25fbnVtYmVyICE9IDMpXG5EZWxwcmV0ZSA8LSBzdWJzZXQoRGVscHJldGUsIEV0aG5pY2l0eSAhPSBcIkJcIilcblxuVmlldyhEZWxwcmV0ZSlcblxuYGBgIn0= -->
+<pre class="r"><code>Delprete &lt;- read_excel(&quot;Delprete.xlsx&quot;)
+
+# Changning data into a data frame
+
+Delprete &lt;- as.data.frame(Delprete)
+
+Delprete &lt;- subset(Delprete, Collection_number != 1)
+Delprete &lt;- subset(Delprete, Collection_number != 2)
+Delprete &lt;- subset(Delprete, Collection_number != 3)
+Delprete &lt;- subset(Delprete, Ethnicity != &quot;B&quot;)
+
+View(Delprete)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
-<!-- rnb-text-end -->
+</div>
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKVGhpcyBpcyBhbiBbUiBNYXJrZG93bl0oaHR0cDovL3JtYXJrZG93bi5yc3R1ZGlvLmNvbSkgTm90ZWJvb2suIFdoZW4geW91IGV4ZWN1dGUgY29kZSB3aXRoaW4gdGhlIG5vdGVib29rLCB0aGUgcmVzdWx0cyBhcHBlYXIgYmVuZWF0aCB0aGUgY29kZS4gCgpUcnkgZXhlY3V0aW5nIHRoaXMgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpSdW4qIGJ1dHRvbiB3aXRoaW4gdGhlIGNodW5rIG9yIGJ5IHBsYWNpbmcgeW91ciBjdXJzb3IgaW5zaWRlIGl0IGFuZCBwcmVzc2luZyAqQ3RybCtTaGlmdCtFbnRlciouIAoKYGBge3J9CnBsb3QoY2FycykKYGBgCgpBZGQgYSBuZXcgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpJbnNlcnQgQ2h1bmsqIGJ1dHRvbiBvbiB0aGUgdG9vbGJhciBvciBieSBwcmVzc2luZyAqQ3RybCtBbHQrSSouCgpXaGVuIHlvdSBzYXZlIHRoZSBub3RlYm9vaywgYW4gSFRNTCBmaWxlIGNvbnRhaW5pbmcgdGhlIGNvZGUgYW5kIG91dHB1dCB3aWxsIGJlIHNhdmVkIGFsb25nc2lkZSBpdCAoY2xpY2sgdGhlICpQcmV2aWV3KiBidXR0b24gb3IgcHJlc3MgKkN0cmwrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4KClRoZSBwcmV2aWV3IHNob3dzIHlvdSBhIHJlbmRlcmVkIEhUTUwgY29weSBvZiB0aGUgY29udGVudHMgb2YgdGhlIGVkaXRvci4gQ29uc2VxdWVudGx5LCB1bmxpa2UgKktuaXQqLCAqUHJldmlldyogZG9lcyBub3QgcnVuIGFueSBSIGNvZGUgY2h1bmtzLiBJbnN0ZWFkLCB0aGUgb3V0cHV0IG9mIHRoZSBjaHVuayB3aGVuIGl0IHdhcyBsYXN0IHJ1biBpbiB0aGUgZWRpdG9yIGlzIGRpc3BsYXllZC4K</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyAwMiAyNCAyMDIwCgojIyBMb2FkaW5nIHRoZSBkYXRhCgpgYGB7cn0KRGVscHJldGUgPC0gcmVhZF9leGNlbCgiRGVscHJldGUueGxzeCIpCgojIENoYW5nbmluZyBkYXRhIGludG8gYSBkYXRhIGZyYW1lCgpEZWxwcmV0ZSA8LSBhcy5kYXRhLmZyYW1lKERlbHByZXRlKQoKRGVscHJldGUgPC0gc3Vic2V0KERlbHByZXRlLCBDb2xsZWN0aW9uX251bWJlciAhPSAxKQpEZWxwcmV0ZSA8LSBzdWJzZXQoRGVscHJldGUsIENvbGxlY3Rpb25fbnVtYmVyICE9IDIpCkRlbHByZXRlIDwtIHN1YnNldChEZWxwcmV0ZSwgQ29sbGVjdGlvbl9udW1iZXIgIT0gMykKRGVscHJldGUgPC0gc3Vic2V0KERlbHByZXRlLCBFdGhuaWNpdHkgIT0gIkIiKQoKVmlldyhEZWxwcmV0ZSkKCmBgYA==</div>
 
 
 
