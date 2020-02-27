@@ -8,6 +8,11 @@ output: html_notebook
 ## Loading the data
 
 ```{r}
+library(mosaic)
+```
+
+
+```{r}
 Delprete <- read_excel("Delprete.xlsx")
 
 # Changning data into a data frame
@@ -21,4 +26,22 @@ Delprete <- subset(Delprete, Ethnicity != "B")
 
 View(Delprete)
 
+library(mosaic)
+
 ```
+
+## Descriptives
+
+```{r}
+favstats(DelPrete$Index_AP_inlet)
+favstats(DelPrete$Index_bispinous)
+favstats(DelPrete$Index_TD_outlet)
+```
+
+## Scatterplots
+```{r}
+plot(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715, xlab="AP Inlet", ylab="Femur Head Adjusted")
+plot(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715, xlab="Bispinous", ylab ="Femur Head Adjusted")
+plot(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715, xlab="TD Outlet", ylab="Femur Head Adjusted")
+```
+
