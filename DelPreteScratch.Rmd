@@ -1,18 +1,183 @@
 ---
-title: "R Notebook"
+title: "DelPrete Scratch Work"
+Author: Matthew Lawson
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+# 02 25 2020
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+## Loading the data
 
 ```{r}
-plot(cars)
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+
+DelPrete <- subset(DelPrete, Collection_number != 1)
+DelPrete <- subset(DelPrete, Collection_number != 2)
+DelPrete <- subset(DelPrete, Collection_number != 3)
+DelPrete <- subset(DelPrete, Ethnicity != "B")
+
+View(Delprete)
+
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+## Histograms 
+
+```{r}
+# Histgrams of the different responses
+
+hist(DelPrete$Index_AP_inlet, xlab = "AP Inlet", main = "AP Inlet")
+hist(DelPrete$Index_bispinous, xlab = "Bispinous", main = "Bispinous")
+hist(DelPrete$Index_TD_outlet, xlab = "TD Outlet", main = "TD Outlet")
+```
+
+```{r}
+# Histogtrams for predictor variables
+
+hist(DelPrete$GM) # Geometric mean of pelvic size
+hist(DelPrete$femur_head_adjusted_1.715) # Size of femur head, used to estimate pelvic size 
+hist(DelPrete$three_groups) # Three groups for year of death, Terry collection did not have any pelvic bones from the 1933 group
+```
+
+
+
+
+
+## Favstats for mean, standard deviation, etc
+
+```{r}
+library(mosaic) # For favstats
+
+
+# Responses
+
+favstats(DelPrete$Index_AP_inlet)
+favstats(DelPrete$Index_bispinous)
+favstats(DelPrete$Index_TD_outlet)
+```
+
+```{r}
+
+# Predictors
+
+favstats(DelPrete$GM)
+favstats(DelPrete$femur_head_adjusted_1.715)
+favstats(DelPrete$Birthdate)
+```
+
+
+
+## Scatter plots between Responses and predictors
+
+```{r}
+plot(DelPrete$Index_AP_inlet, DelPrete$GM, xlab = "AP Inlet", ylab = "Geometric Mean")
+plot(DelPrete$Index_bispinous, DelPrete$GM, xlab = "Bispinous", ylab = "Geometric Mean")
+plot(DelPrete$Index_TD_outlet, DelPrete$GM, xlab = "TD Outlet", ylab = "Geometric Mean")
+```
+
+```{r}
+# Scatter plots comparing responses with birth year
+
+plot(DelPrete$Index_AP_inlet, DelPrete$Birthdate)
+plot(DelPrete$Index_bispinous, DelPrete$Birthdate)
+plot(DelPrete$Index_TD_outlet, DelPrete$Birthdate)
+```
+
+```{r}
+# Death year
+
+plot(DelPrete$Index_AP_inlet, DelPrete$date_of_death)
+plot(DelPrete$Index_bispinous, DelPrete$date_of_death)
+plot(DelPrete$Index_TD_outlet, DelPrete$date_of_death)
+```
+
+## Correlations
+
+```{r}
+
+# Correlation between responses and Geometric Means
+
+cor(DelPrete$Index_AP_inlet, DelPrete$GM)
+cor(DelPrete$Index_bispinous, DelPrete$GM)
+cor(DelPrete$Index_TD_outlet, DelPrete$GM)
+```
+
+```{r}
+
+#Correlation between responses and femur head adjusted
+
+cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+# 02 26 2020
+
+## Box Plots
+
+```{r}
+boxplot(DelPrete$Index_AP_inlet, main = "AP Inlet")
+boxplot(DelPrete$Index_bispinous, main = "Bispinous")
+boxplot(DelPrete$Index_TD_outlet, main = "TD Outlet")
+```
+
+## Skewness
+
+```{r}
+
+library(PerformanceAnalytics)
+?skewness
+skewness(DelPrete$Index_AP_inlet, method = "sample")
+skewness(DelPrete$Index_bispinous, method = "sample")
+skewness(DelPrete$Index_TD_outlet, method = "sample")
+```
+
+## Kurtosis
+
+```{r}
+?kurtosis
+kurtosis(DelPrete$Index_AP_inlet)
+kurtosis(DelPrete$Index_bispinous)
+kurtosis(DelPrete$Index_TD_outlet)
+```
+
+# 02 27 2020
+
+## Correlations between death year and pelvic size
+
+```{r}
+cor(DelPrete$Index_AP_inlet, DelPrete$date_of_death)
+cor(DelPrete$Index_bispinous, DelPrete$date_of_death)
+cor(DelPrete$Index_TD_outlet, DelPrete$date_of_death)
+
+```
+
+Correlations are very low. Repsonses are not correlated with the response variables.
+
+```{r}
+cor(DelPrete$Index_AP_inlet, DelPrete$Birthdate)
+cor(DelPrete$Index_bispinous, DelPrete$Birthdate)
+cor(DelPrete$Index_TD_outlet, DelPrete$Birthdate)
+```
+
+Birth year and response variables are not correlated at all. Nice.
+
+
+```{r}
+Pelvic.cor <- function(a, b) {
+  a <- a
+  b <- b
+  p.cor <- cor(a, b)
+  
+  return(p.cor)
+}
+
+Pelvic.cor(DelPrete$Index_AP_inlet, DelPrete$Birthdate)
+```
+
+
