@@ -19,10 +19,10 @@ Delprete <- read_excel("Delprete.xlsx")
 
 Delprete <- as.data.frame(Delprete)
 
-Delprete <- subset(Delprete, Collection_number != 1)
-Delprete <- subset(Delprete, Collection_number != 2)
-Delprete <- subset(Delprete, Collection_number != 3)
-Delprete <- subset(Delprete, Ethnicity != "B")
+DelPrete <- subset(Delprete, Collection_number != 1)
+DelPrete <- subset(Delprete, Collection_number != 2)
+DelPrete <- subset(Delprete, Collection_number != 3)
+DelPrete <- subset(Delprete, Ethnicity != "B")
 
 View(Delprete)
 
@@ -40,9 +40,25 @@ favstats(DelPrete$Index_TD_outlet)
 
 ## Scatterplots
 ```{r}
-plot(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715, xlab="AP Inlet", ylab="Femur Head Adjusted")
-plot(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715, xlab="Bispinous", ylab ="Femur Head Adjusted")
-plot(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715, xlab="TD Outlet", ylab="Femur Head Adjusted")
+plot(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715, main="Index AP Inlet vs. Femur Head Adjusted", xlab="Index AP Inlet", ylab="Femur Head Adjusted")
 
+plot(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715, main="Index Bispinous vs. Femur Head Adjusted", xlab="Index Bispinous", ylab ="Femur Head Adjusted")
+
+plot(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715, main="Index TD Outlet vs. Femur Head Adjusted", xlab="Index TD Outlet", ylab="Femur Head Adjusted")
+
+plot(DelPrete$Index_pelvic_breadth, DelPrete$GM, xlab ="Index Pelvic Breadth", ylab="Geometric Mean", main ="Pelvic Breadth vs. GM")
+
+plot(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715, xlab ="Index Pelvic Breadth", ylab="Femur Head Adjusted", main ="Pelvic Breadth vs. Femur Head")
+
+plot(DelPrete$Index_AP_outlet, DelPrete$GM, xlab ="Index AP Outlet", ylab="Geometric Mean", main="AP Outlet vs. GM")
+
+plot(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715, xlab ="Index AP Outlet", ylab="Femur Head Adjusted", main = "AP Outlet vs. Femur Head")
 ```
 
+## Correlations
+```{r}
+cor(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_pelvic_breadth, DelPrete$GM)
+cor(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_AP_outlet, DelPrete$GM)
+```
