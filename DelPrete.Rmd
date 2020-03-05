@@ -61,4 +61,5 @@ cor(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
 cor(DelPrete$Index_pelvic_breadth, DelPrete$GM)
 cor(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
 cor(DelPrete$Index_AP_outlet, DelPrete$GM)
+
 ```
