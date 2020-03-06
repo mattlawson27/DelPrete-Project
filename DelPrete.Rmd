@@ -13,16 +13,16 @@ library(mosaic)
 
 
 ```{r}
-Delprete <- read_excel("Delprete.xlsx")
+DelPrete <- read_excel("Delprete.xlsx")
 
 # Changning data into a data frame
 
-Delprete <- as.data.frame(Delprete)
+DelPrete <- as.data.frame(DelPrete)
 
-Delprete <- subset(Delprete, Collection_number != 1)
-Delprete <- subset(Delprete, Collection_number != 2)
-Delprete <- subset(Delprete, Collection_number != 3)
-Delprete <- subset(Delprete, Ethnicity != "B")
+DelPrete <- subset(DelPrete, Collection_number != 1)
+DelPrete <- subset(DelPrete, Collection_number != 2)
+DelPrete <- subset(DelPrete, Collection_number != 3)
+DelPrete <- subset(DelPrete, Ethnicity != "B")
 
 View(Delprete)
 
@@ -45,4 +45,29 @@ plot(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715, xlab="Bispino
 plot(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715, xlab="TD Outlet", ylab="Femur Head Adjusted")
 
 ```
+
+
+## Correlations
+
+```{r}
+
+# Correlation between responses and Geometric Means
+
+cor(DelPrete$Index_AP_inlet, DelPrete$GM)
+cor(DelPrete$Index_bispinous, DelPrete$GM)
+cor(DelPrete$Index_TD_outlet, DelPrete$GM)
+
+```
+
+
+```{r}
+
+# Correlation between responses and femur head adjusted
+
+cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+
 
