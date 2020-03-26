@@ -30,7 +30,7 @@ DelPrete <- Delprete
 DelPreteTW <- subset(DelPrete, Collection_number !=1)
 DelPreteTW <- subset(DelPrete, Collection_number !=2)
 DelPreteTW <- subset(DelPrete, Collection_number !=3)
-DelPreteTW <- subset(DelPreteTB, Ethnicity !="B")
+DelPreteTW <- subset(DelPreteTW, Ethnicity !="B")
 ```
 
 
@@ -46,11 +46,18 @@ favstats(DelPrete$Index_TD_outlet)
 ```{r}
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab="Geometric Mean", main = "AP Inlet vs. Geometric Mean")
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Inlet", ylab="Femur Head Adjusted", main ="AP Inlet vs. Femur Head")
+
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
 ```
 # TD Outlet
 ```{r}
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$GM, xlab = "TD Outlet", ylab="Geometric Mean", main = "TD Outlet vs. Geometric Mean")
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "TD Outlet", ylab="Femur Head Adjusted", main ="TD Outlet vs. Femur Head")
+
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+
 ```
 
 # Bispinous
@@ -60,6 +67,9 @@ plot(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715, xlab = "B
 
 cor(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
 cor(DelPrete$Index_bispinous, DelPrete$GM)
+
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
 ```
 
 # Pelvic Breadth
@@ -69,6 +79,9 @@ plot(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715, xlab
 
 cor(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
 cor(DelPrete$Index_pelvic_breadth, DelPrete$GM)
+
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
 ```
 
 # AP Outlet
@@ -78,5 +91,9 @@ plot(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "A
 
 cor(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
 cor(DelPrete$Index_AP_outlet, DelPrete$GM)
+
+
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
 ```
 
