@@ -50,4 +50,8 @@ plot(DelPrete$Index_AP_outlet, DelPrete$GM, xlab ="Index AP Outlet", ylab="Geome
 plot(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715, xlab ="Index AP Outlet", ylab="Femur Head Adjusted", main = "AP Outlet vs. Femur Head")
 ```
 
-
+# Ap Inlet
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab="Geometric Mean", main = "AP Inlet vs. Geometric Mean")
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Inlet", ylab="Femur Head Adjusted", main ="AP Inlet vs. Femur Head")
+```
