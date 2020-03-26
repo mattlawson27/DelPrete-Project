@@ -37,20 +37,28 @@ DelPreteTW <- subset(DelPreteTB, Ethnicity !="B")
 ## Descriptives
 
 ```{r}
-favstats(DelPrete$Index_AP_inlet)
-favstats(DelPrete$Index_bispinous)
-favstats(DelPrete$Index_TD_outlet)
+favstats(DelPreteTW$Index_AP_inlet)
+favstats(DelPreteTW$Index_bispinous)
+favstats(DelPreteTW$Index_TD_outlet)
+favstats(DelPreteTW$Index_AP_outlet)
+favstats(DelPreteTW$Index_pelvic_breadth)
 ```
 
 # Ap Inlet
 ```{r}
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab="Geometric Mean", main = "AP Inlet vs. Geometric Mean")
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Inlet", ylab="Femur Head Adjusted", main ="AP Inlet vs. Femur Head")
+
+cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_AP_inlet, DelPrete$GM)
 ```
 # TD Outlet
 ```{r}
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$GM, xlab = "TD Outlet", ylab="Geometric Mean", main = "TD Outlet vs. Geometric Mean")
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "TD Outlet", ylab="Femur Head Adjusted", main ="TD Outlet vs. Femur Head")
+
+cor(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715)
+cor(DelPrete$Index_TD_outlet, DelPrete$GM)
 ```
 
 # Bispinous
