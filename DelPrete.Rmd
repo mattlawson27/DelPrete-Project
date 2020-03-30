@@ -27,9 +27,9 @@ library(mosaic)
 
 ```{r}
 DelPrete <- Delprete
-DelPreteTW <- subset(DelPrete, Collection_number !=1)
-DelPreteTW <- subset(DelPrete, Collection_number !=2)
-DelPreteTW <- subset(DelPrete, Collection_number !=3)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=1)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
 DelPreteTW <- subset(DelPreteTW, Ethnicity !="B")
 ```
 
@@ -87,4 +87,3 @@ plot(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "A
 cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
 cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
 ```
-
