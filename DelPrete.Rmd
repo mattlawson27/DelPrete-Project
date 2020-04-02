@@ -169,3 +169,4 @@ nlCor(DelPreteT$Index_bispinous, DelPreteT$GM)
 nlCor(DelPreteT$Index_bispinous, DelPreteT$femur_head_adjusted_1.715)
 ```
 
+
