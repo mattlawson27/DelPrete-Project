@@ -142,7 +142,7 @@ View(DelPreteT)
 wilcox.test(DelPreteT$Index_AP_outlet ~ DelPreteT$Ethnicity)
 ```
 
-For the Wilcoxson-Signed Rank Test we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection and therefore there is a difference between the two groups.
+For the Mann Whitney U test we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection and therefore there is a difference between the two groups.
 
 
 

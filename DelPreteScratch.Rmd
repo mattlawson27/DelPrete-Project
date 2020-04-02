@@ -3,16 +3,312 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+
+DelPreteTW <- subset(DelPrete, Collection_number != 1)
+DelPreteTW <- subset(DelPreteTW, Collection_number != 2)
+DelPreteTW <- subset(DelPreteTW, Collection_number != 3)
+DelPreteTW <- subset(DelPreteTW, Ethnicity != "B")
+
+View(DelPreteTW)
+
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+## Histograms 
+
+```{r}
+# Histgrams of the different responses
+
+hist(DelPrete$Index_AP_inlet, xlab = "AP Inlet", main = "AP Inlet")
+hist(DelPrete$Index_bispinous, xlab = "Bispinous", main = "Bispinous")
+hist(DelPrete$Index_TD_outlet, xlab = "TD Outlet", main = "TD Outlet")
+```
+
+```{r}
+# Histgrams of the different responses
+
+hist(DelPreteTW$Index_AP_inlet, xlab = "AP Inlet", main = "AP Inlet")
+hist(DelPreteTW$Index_bispinous, xlab = "Bispinous", main = "Bispinous")
+hist(DelPreteTW$Index_TD_outlet, xlab = "TD Outlet", main = "TD Outlet")
+```
+
+```{r}
+# Histogtrams for predictor variables
+
+hist(DelPreteTW$GM) # Geometric mean of pelvic size
+hist(DelPreteTW$femur_head_adjusted_1.715) # Size of femur head, used to estimate pelvic size 
+hist(DelPreteTW$three_groups) # Three groups for year of death, Terry collection did not have any pelvic bones from the 1933 group
+```
+
+
+
+
+
+## Favstats for mean, standard deviation, etc
+
+```{r}
+library(mosaic) # For favstats
+
+
+# Responses
+
+favstats(DelPreteTW$Index_AP_inlet)
+favstats(DelPreteTW$Index_bispinous)
+favstats(DelPreteTW$Index_TD_outlet)
+```
+
+```{r}
+
+# Predictors
+
+favstats(DelPreteTW$GM)
+favstats(DelPreteTW$femur_head_adjusted_1.715)
+favstats(DelPreteTW$Birthdate)
+```
+
+
+
+## Scatter plots between Responses and predictors
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab = "Geometric Mean")
+plot(DelPreteTW$Index_bispinous, DelPreteTW$GM, xlab = "Bispinous", ylab = "Geometric Mean")
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$GM, xlab = "TD Outlet", ylab = "Geometric Mean")
+```
+
+```{r}
+# Scatter plots comparing responses with birth year
+
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$Birthdate)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$Birthdate)
+```
+
+```{r}
+# Death year
+
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$date_of_death)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$date_of_death)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$date_of_death)
+```
+
+## Correlations
+
+```{r}
+
+# Correlation between responses and Geometric Means
+
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$GM)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$GM)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$GM)
+
+```
+
+```{r}
+
+# Correlation between responses and femur head adjusted
+
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+# 02 26 2020
+
+## Box Plots
+
+```{r}
+boxplot(DelPreteTW$Index_AP_inlet, main = "AP Inlet")
+boxplot(DelPreteTW$Index_bispinous, main = "Bispinous")
+boxplot(DelPreteTW$Index_TD_outlet, main = "TD Outlet")
+```
+
+
+
+# 02 27 2020
+
+## Correlations between death year and pelvic size
+
+```{r}
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$date_of_death)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$date_of_death)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$date_of_death)
+
+```
+
+Correlations are very low. Repsonses are not correlated with the response variables.
+
+```{r}
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$Birthdate)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$Birthdate)
+```
+
+Birth year and response variables are not correlated at all. Nice.
+
+
+```{r}
+Pelvic.cor <- function(a, b) {
+  a <- a
+  b <- b
+  p.cor <- cor(a, b)
+  
+  return(p.cor)
+}
+
+Pelvic.cor(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+```
+
+# 03 02 2020
+
+## LN transformation of data for correlation
+
+```{r}
+?log
+DelPreteTW$LnGM <- log(DelPreteTW$GM)
+DelPreteTW$LnFemur <- log(DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## Plots
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$LnGM)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$LnGM)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$LnGM)
+```
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$LnFemur)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$LnFemur)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$LnFemur)
+```
+
+
+## Correlation
+
+```{r}
+cor(DelPreteTW$LnGM, DelPreteTW$Index_AP_inlet)
+cor(DelPreteTW$LnGM, DelPreteTW$Index_bispinous)
+cor(DelPreteTW$LnGM, DelPreteTW$Index_TD_outlet)
+```
+
+
+```{r}
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_AP_inlet)
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_bispinous)
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_TD_outlet)
+```
+
+Transforming the data with a natural log transformation did not improve the correlations. This is very unfortunate. Dr. DelPrete want us to see if there was correlation between the responses and the predictors but we have not found any even with the transformations. 
+
+
+
+# 03 05 2020
+
+New responses: Pelvic Breadth and AP Outlet
+
+## More Correlations
+
+```{r}
+# Correlations between responses and Geometric Mean
+
+cor(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
+cor(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
+```
+
+
+```{r}
+# Correlations between responses and femur head adjusted
+
+cor(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+
+
+
+# 03 24 2020
+
+## Correlation Tests
+
+```{r}
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
+```
+
+```{r}
+
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## T tests and Wilcoxon Signed Rank Tests
+
+Restoring the data set to the Terry Collection with both genders.
+
+```{r}
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+
+DelPreteT <- subset(DelPrete, Collection_number != 1)
+DelPreteT <- subset(DelPreteT, Collection_number != 2)
+DelPreteT <- subset(DelPreteT, Collection_number != 3)
+```
+
+
+```{r}
+hist(DelPreteT$Index_AP_inlet)
+hist(DelPreteT$Index_bispinous)
+hist(DelPreteT$Index_TD_outlet)
+hist(DelPreteT$Index_pelvic_breadth)
+hist(DelPreteT$Index_AP_outlet)
+```
+
+The AP Inlet and Pelvic Breadth index values are the only two which is normally distributed, so we can use a t test. The responses are not normally distributed so we have to use a non parametric test.
+
+```{r}
+?t.test
+t.test(DelPreteT$Index_AP_inlet ~ DelPreteT$Ethnicity)
+t.test(DelPreteT$Index_pelvic_breadth ~ DelPreteT$Ethnicity)
+```
+
+Since the p-value for the AP Inlet is greater than 0.05 we cannot conclude that there is a statistical difference between the mean AP Inlet index value of the races of the Terry collection.
+Since the p-value for the Pelvic Breadth is less than 0.05 we can conclude that there is a statistical difference between the mean Pelvic Breadth index value of the races of the Terry collection.
+
+```{r}
+
+wilcox.test(DelPreteT$Index_bispinous ~ DelPreteT$Ethnicity)
+wilcox.test(DelPreteT$Index_TD_outlet ~ DelPreteT$Ethnicity)
+wilcox.test(DelPreteT$Index_AP_outlet ~ DelPreteT$Ethnicity)
+```
+
+For the Bispinous and the TD Outlet index values we see that the p-value is greater than 0.05 so we cannot conclude that the ranks for each index value are different, respectively.
+For the AP Outlet index value we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection.
+
+```{r}
+hist(DelPrete$Index_AP_inlet)
+hist(DelPrete$Index_bispinous)
+hist(DelPrete$Index_TD_outlet)
+hist(DelPrete$Index_pelvic_breadth)
+hist(DelPrete$Index_AP_outlet)
+```
+
+
+
+
