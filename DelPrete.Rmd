@@ -26,6 +26,11 @@ library(mosaic)
 ```
 
 ```{r}
+DelPrete <- Delprete
+DelPreteTW <- subset(DelPreteTW, Collection_number !=1)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
+
 # Subsetting the data so its just the Terry Collection
 
 DelPreteT <- subset(DelPrete, Collection_number != 1)
@@ -39,25 +44,32 @@ DelPreteT <- subset(DelPreteT, Collection_number != 3)
 
 
 DelPreteTW <- subset(DelPrete, Collection_number !=1)
-DelPreteTW <- subset(DelPrete, Collection_number !=2)
-DelPreteTW <- subset(DelPrete, Collection_number !=3)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
 DelPreteTW <- subset(DelPreteTW, Ethnicity !="B")
 ```
 
+```{r}
+sorting.collections <- function(C, E) {
+  DelPreteCE <- subset(DelPrete, Collection_number == C)
+  DelPreteCE <- subset(DelPreteCE, Ethnicity == E)
+  return(DelPreteCE)
+}
+```
 
 
 ## Descriptives
 
 ```{r}
-favstats(DelPrete$Index_AP_inlet)
-favstats(DelPrete$Index_bispinous)
-favstats(DelPrete$Index_TD_outlet)
+favstats(DelPreteTW$Index_AP_inlet)
+favstats(DelPreteTW$Index_bispinous)
+favstats(DelPreteTW$Index_TD_outlet)
 ```
 
 # Ap Inlet
 ```{r}
 
-hist(DelPreteT$Index_AP_inlet)
+hist(DelPreteT$Index_AP_inlet, xlab = "AP Inlet", main="Histogram of AP Inlet")
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab="Geometric Mean", main = "AP Inlet vs. Geometric Mean")
 plot(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Inlet", ylab="Femur Head Adjusted", main ="AP Inlet vs. Femur Head")
 
@@ -74,7 +86,7 @@ For the t-test, the p-value for the AP Inlet is greater than 0.05 so we cannot c
 # TD Outlet
 ```{r}
 
-hist(DelPreteT$Index_TD_outlet)
+hist(DelPreteT$Index_TD_outlet, xlab="TD Outlet", main="Histogram of TD Outlet")
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$GM, xlab = "TD Outlet", ylab="Geometric Mean", main = "TD Outlet vs. Geometric Mean")
 plot(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "TD Outlet", ylab="Femur Head Adjusted", main ="TD Outlet vs. Femur Head")
 
@@ -90,12 +102,9 @@ For the Wilcoxson-Signed Rank Test we see that the p-value is greater than 0.05 
 # Bispinous
 ```{r}
 
-hist(DelPreteT$Index_bispinous)
+hist(DelPreteT$Index_bispinous, xlab = "Bispinous", main="Histogram of Bispinous")
 plot(DelPreteTW$Index_bispinous, DelPreteTW$GM, xlab = "Bispinous", ylab="Geometric Mean", main = "Bispsinous vs. Geometric Mean")
 plot(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715, xlab = "Bispinous", ylab="Femur Head Adjusted", main ="Bispinous vs. Femur Head")
-
-cor(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
-cor(DelPrete$Index_bispinous, DelPrete$GM)
 
 cor.test(DelPreteTW$Index_bispinous, DelPreteTW$GM)
 cor.test(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
@@ -108,12 +117,9 @@ For the Wilcoxson-Signed Rank Test we see that the p-value is greater than 0.05 
 # Pelvic Breadth
 ```{r}
 
-hist(DelPreteT$Index_pelvic_breadth)
+hist(DelPreteT$Index_pelvic_breadth, xlab = "Pelvic Breadth", main = "Histogram of Pelvic Breadth")
 plot(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM, xlab = "Pelvic Breadth", ylab="Geometric Mean", main = "Pelvic Breadth vs. Geometric Mean")
 plot(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715, xlab = "Pelvic Breadth", ylab="Femur Head Adjusted", main ="Pelvic Breadth vs. Femur Head")
-
-cor(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
-cor(DelPrete$Index_pelvic_breadth, DelPrete$GM)
 
 cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
 cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
@@ -127,12 +133,9 @@ Since the p-value for the Pelvic Breadth is less than 0.05 so we can conclude th
 # AP Outlet
 ```{r}
 
-hist(DelPreteT$Index_AP_outlet)
+hist(DelPreteT$Index_AP_outlet, xlab ="AP Outlet", main ="Histogram of AP Outlet")
 plot(DelPreteTW$Index_AP_outlet, DelPreteTW$GM, xlab = "AP Outlet", ylab="Geometric Mean", main = "AP Outlet vs. Geometric Mean")
 plot(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Outlet", ylab="Femur Head Adjusted", main ="AP Outlet vs. Femur Head")
-
-cor(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
-cor(DelPrete$Index_AP_outlet, DelPrete$GM)
 
 
 cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
@@ -142,8 +145,37 @@ View(DelPreteT)
 wilcox.test(DelPreteT$Index_AP_outlet ~ DelPreteT$Ethnicity)
 ```
 
+
 For the Mann Whitney U test we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection and therefore there is a difference between the two groups.
 
+
+
+```{r}
+install.packages("devtools", dependencies=TRUE)
+```
+
+```{r}
+install.packages("usethis")
+```
+
+```{r}
+library(usethis)
+```
+
+
+```{r}
+library(devtools)
+```
+
+
+```{r}
+library("nlCor")
+```
+
+```{r}
+nlCor(DelPreteT$Index_bispinous, DelPreteT$GM)
+nlCor(DelPreteT$Index_bispinous, DelPreteT$femur_head_adjusted_1.715)
+```
 
 
 

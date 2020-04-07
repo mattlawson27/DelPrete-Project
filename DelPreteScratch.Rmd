@@ -309,6 +309,63 @@ hist(DelPrete$Index_pelvic_breadth)
 hist(DelPrete$Index_AP_outlet)
 ```
 
+# 04 02 20
+
+## New Correlations, non linear
+
+
+```{r}
+#' Computes the rank correlation between to samples
+#' @param x vector containing the first sample of data
+#' @param y vector containing the second sample of data
+#'
+#' @return the rank correlation
+
+rankcor <- function(x, y){
+  n <- length(x)
+  stopifnot(length(y) == n)
+  
+  x.ranks <- rank(x)
+  y.ranks <- rank(y)
+  
+  covariance.term <- cov(x.ranks, y.ranks)
+  
+  sd.x <- sqrt((((n^2)-1)/12)*(n/(n-1)))
+  sd.y <- sqrt((((n^2)-1)/12)*(n/(n-1)))
+  
+  rank.cor <- covariance.term / (sd.x*sd.y)
+  
+  
+  return(rank.cor)
+}
+```
+
+
+
+```{r}
+rankcor(DelPreteT$Index_bispinous, DelPreteT$GM)
+```
+
+
+```{r}
+cor(DelPrete$Index_bispinous, DelPrete$GM)
+
+plot(DelPrete$Index_bispinous, DelPrete$GM)
+
+rankcor(DelPrete$Index_bispinous, DelPrete$GM)
+```
+
+```{r}
+Del.response <- list(AP.Inlet = DelPrete$Index_AP_inlet, AP.Outlet = DelPrete$Index_AP_outlet, Bispinous = DelPrete$Index_bispinous, Pelvic.Breadth = DelPrete$Index_pelvic_breadth, TD.Outlet = DelPrete$Index_TD_outlet)
+
+Del.pred <- list(GM = DelPrete$GM, Femur.Head.Adj = DelPrete$femur_head_adjusted_1.715)
+length(Del.response)
+Del.response[[5]]
+Del.response[5]
+
+
+```
+
 
 
 
