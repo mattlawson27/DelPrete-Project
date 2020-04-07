@@ -366,6 +366,75 @@ Del.response[5]
 
 ```
 
+# 4 07 2020
+
+```{r}
+smooth.spline(DelPrete$GM, DelPrete$Index_AP_inlet)
+
+plot(DelPrete$GM, DelPrete$Index_AP_inlet, xlab = "GM", ylab = "AP Inlet")
+lines(smooth.spline(DelPrete$GM, DelPrete$Index_AP_inlet), col = "blue")
+
+```
+
+```{r}
+smooth.spline(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet)
+
+plot(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet, xlab = "Femur Head Adjusted", ylab = "AP Inlet")
+lines(smooth.spline(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet), col = "blue")
+
+```
+
+```{r}
+install.packages("mgcv")
+```
+
+```{r}
+library(mgcv)
+```
+
+```{r}
+
+AP.GM <-gam(Index_AP_inlet ~ s(GM), data = DelPrete)
+
+plot(AP.GM, residuals = TRUE)
+summary(AP.GM)
+gam.check(AP.GM)
+cor.test(DelPrete$Index_AP_inlet, DelPrete$GM)
+```
+
+```{r}
+
+AP.GM.T <-gam(Index_AP_inlet ~ s(GM), data = DelPreteT)
+
+plot(AP.GM.T, residuals = TRUE)
+summary(AP.GM.T)
+gam.check(AP.GM.T)
+cor.test(DelPreteT$Index_AP_inlet, DelPreteT$GM)
+```
+
+```{r}
+DelPreteC <- sorting.collections.all(2)
+```
+
+```{r}
+
+AP.GM.C <-gam(Index_AP_inlet ~ s(GM), data = DelPreteC)
+
+plot(AP.GM.C, residuals = TRUE)
+summary(AP.GM.C)
+gam.check(AP.GM.C)
+cor.test(DelPreteC$Index_AP_inlet, DelPreteC$GM)
+```
 
 
 
+
+```{r}
+
+TD.GM <-gam(Index_TD_outlet ~ s(GM), data = DelPrete)
+
+plot(AP.GM.T, residuals = TRUE)
+summary(AP.GM.T)
+gam.check(AP.GM.T)
+cor.test(DelPreteT$Index_AP_inlet, DelPreteT$GM)
+```
