@@ -50,13 +50,25 @@ DelPreteTW <- subset(DelPreteTW, Ethnicity !="B")
 ```
 
 ```{r}
-sorting.collections <- function(C, E) {
+sorting.collections.eth <- function(C, E) {
   DelPreteCE <- subset(DelPrete, Collection_number == C)
   DelPreteCE <- subset(DelPreteCE, Ethnicity == E)
   return(DelPreteCE)
 }
 ```
 
+```{r}
+sorting.collections.all <- function(C) {
+  DelPreteC <- subset(DelPrete, Collection_number == C)
+  return(DelPreteC)
+}
+```
+
+```{r}
+DelPreteS <- sorting.collections.all(1)
+DelPreteC <- sorting.collections.all(2)
+DelPreteHT <- sorting.collections.all(3)
+```
 
 ## Descriptives
 
@@ -153,29 +165,77 @@ For the Mann Whitney U test we see that the p-value is less than 0.05 so we can 
 ```{r}
 install.packages("devtools", dependencies=TRUE)
 ```
-
-```{r}
-install.packages("usethis")
-```
-
-```{r}
-library(usethis)
-```
-
-
 ```{r}
 library(devtools)
 ```
 
-
+```{r}
+devtools::install_github("pratikpitreds/nlCor")
+```
 ```{r}
 library("nlCor")
 ```
 
+
+
 ```{r}
-nlCor(DelPreteT$Index_bispinous, DelPreteT$GM)
-nlCor(DelPreteT$Index_bispinous, DelPreteT$femur_head_adjusted_1.715)
+?nlCor
+nlCor(DelPreteT$Index_bispinous, DelPreteT$GM, method =c("poly", "expo", "Linear","log"))
+plot(DelPreteT$Index_bispinous, DelPreteT$GM)
 ```
 
+# Correlation Function
+```{r}
+cor.index <- function(x,y=Delprete$femur_head_adjusted_1.715) {
+  nlc <- vector()
+  c <- vector()
+  Cor.list <- list(nlc, c)
+  for (i in 1:length(x)){
+    Cor.list$nlc[i] <- c(nlCor(x[[i]],y, method = "log"), nlCor(x[[i]],y, method="poly"), nlCor(x[[i]],y, method = "expo"))
+    Cor.list$c[i] <- cor(x[[i]],y)
+  }
+  return(Cor.list)
+}
+```
+
+## Cor of All Data
+```{r}
+x <- list(Delprete$Index_bispinous, Delprete$Index_AP_inlet, Delprete$Index_AP_outlet, Delprete$Index_TD_outlet, Delprete$Index_pelvic_breadth)
+
+cor.index(x, y=Delprete$femur_head_adjusted_1.715)
+cor.index(x, y=Delprete$GM)
+```
+
+## Cor of T Collection
+```{r}
+T <- list(DelPreteT$Index_bispinous, DelPreteT$Index_AP_inlet,DelPreteT$Index_AP_outlet, DelPreteT$Index_TD_outlet, DelPreteT$Index_pelvic_breadth)
+
+cor.index(T, y=DelPreteT$femur_head_adjusted_1.715)
+cor.index(T, y=DelPreteT$GM)
+```
+
+## Cor of S Collection
+```{r}
+S <- list(DelPreteS$Index_bispinous, DelPreteS$Index_AP_inlet,DelPreteS$Index_AP_outlet, DelPreteS$Index_TD_outlet, DelPreteS$Index_pelvic_breadth)
+
+cor.index(S, y=DelPreteS$femur_head_adjusted_1.715)
+cor.index(S, y=DelPreteS$GM)
+```
+
+## Cor of HT Collection
+```{r}
+HT <- list(DelPreteHT$Index_bispinous, DelPreteHT$Index_AP_inlet,DelPreteHT$Index_AP_outlet, DelPreteHT$Index_TD_outlet, DelPreteHT$Index_pelvic_breadth)
+
+cor.index(HT, y=DelPreteHT$femur_head_adjusted_1.715)
+cor.index(HT, y=DelPreteHT$GM)
+```
+
+## Cor of C Collection
+```{r}
+C <- list(DelPreteC$Index_bispinous, DelPreteC$Index_AP_inlet,DelPreteC$Index_AP_outlet, DelPreteC$Index_TD_outlet, DelPreteC$Index_pelvic_breadth)
+
+cor.index(C, y=DelPreteC$femur_head_adjusted_1.715)
+cor.index(C, y=DelPreteC$GM)
+```
 
 

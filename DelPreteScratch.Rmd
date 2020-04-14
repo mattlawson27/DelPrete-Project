@@ -4,6 +4,11 @@ output: html_notebook
 ---
 
 ```{r}
+library(mosaic)
+```
+
+
+```{r}
 DelPrete <- read_excel("Delprete.xlsx")
 
 # Changning data into a data frame
@@ -391,9 +396,12 @@ install.packages("mgcv")
 ```{r}
 library(mgcv)
 ```
+## AP Inlet
+
+### GM
 
 ```{r}
-
+?plot
 AP.GM <-gam(Index_AP_inlet ~ s(GM), data = DelPrete)
 
 plot(AP.GM, residuals = TRUE)
@@ -401,6 +409,132 @@ summary(AP.GM)
 gam.check(AP.GM)
 cor.test(DelPrete$Index_AP_inlet, DelPrete$GM)
 ```
+
+### Femur Head Adj
+
+```{r}
+AP.Femur <-gam(Index_AP_inlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(AP.Femur, residuals = TRUE)
+summary(AP.Femur)
+gam.check(AP.Femur)
+cor.test(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## TD Outlet
+
+### GM
+
+```{r}
+
+TD.OUT.GM <-gam(Index_TD_outlet ~ s(GM), data = DelPrete)
+
+plot(TD.OUT.GM, residuals = TRUE)
+summary(TD.OUT.GM)
+gam.check(TD.OUT.GM)
+cor.test(DelPrete$Index_TD_outlet, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+TD.OUT.Femur <-gam(Index_TD_outlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(TD.OUT.Femur, residuals = TRUE)
+summary(TD.OUT.Femur)
+gam.check(TD.OUT.Femur)
+cor.test(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## AP Outlet
+
+### GM
+
+```{r}
+
+AP.OUT.GM <-gam(Index_AP_outlet ~ s(GM), data = DelPrete)
+
+plot(AP.OUT.GM, residuals = TRUE)
+summary(AP.OUT.GM)
+gam.check(AP.OUT.GM)
+cor.test(DelPrete$Index_AP_outlet, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+AP.OUT.Femur <-gam(Index_AP_outlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(AP.OUT.Femur, residuals = TRUE)
+summary(AP.OUT.Femur)
+gam.check(AP.OUT.Femur)
+cor.test(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## Bispinous
+
+### GM
+
+```{r}
+
+Bispi.GM <-gam(Index_bispinous ~ s(GM), data = DelPrete)
+
+plot(Bispi.GM, residuals = TRUE)
+summary(Bispi.GM)
+gam.check(Bispi.GM)
+cor.test(DelPrete$Index_bispinous, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+Bispi.Femur <-gam(Index_bispinous ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(Bispi.Femur, residuals = TRUE)
+summary(Bispi.Femur)
+gam.check(Bispi.Femur)
+cor.test(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
+```
+
+
+## Pelvic Breadth
+
+### GM
+
+```{r}
+
+PB.GM <-gam(Index_pelvic_breadth ~ s(GM), data = DelPrete)
+
+plot(PB.GM, residuals = TRUE)
+summary(PB.GM)
+gam.check(PB.GM)
+cor.test(DelPrete$Index_pelvic_breadth, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+PB.Femur <-gam(Index_pelvic_breadth ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(PB.Femur, residuals = TRUE)
+summary(PB.Femur)
+gam.check(PB.Femur)
+cor.test(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 
@@ -438,3 +572,66 @@ summary(AP.GM.T)
 gam.check(AP.GM.T)
 cor.test(DelPreteT$Index_AP_inlet, DelPreteT$GM)
 ```
+
+
+
+```{r}
+cor.all <- function(x,y) {
+  nlc <- vector()
+  c <- vector()
+  Cor.list <- list(nlc, c)
+  for (k in 1:length(y)) {
+  for (i in 1:length(x)){
+    Cor.list$nlc[i] <- c(nlCor(x[[i]],y[[k]], method = "log"), nlCor(x[[i]],y[[k]], method="poly"), nlCor(x[[i]],y[[k]], method = "expo"))
+    Cor.list$c[i] <- cor(x[[i]],y[[k]])
+  }
+  }
+  return(Cor.list)
+}
+
+
+```
+
+```{r}
+names(Del.response)
+names(Del.pred)
+```
+
+```{r}
+?array
+
+cor.array <- array(dim = c(length(x),length(y)))
+cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+```{r}
+descrip.Del <- function(resp,pred){
+  descriptives <- list()
+  for (i in 1:length(resp)){
+    descriptives[i] <- favstats(resp[[i]])
+    hist(resp[[i]], xlab = names(resp[i]))
+  }
+}
+```
+
+
+
+```{r}
+cor.all.lin <- function(resp,pred) {
+  cor.array <- array(dim = c(length(resp),length(pred)), dimnames = list(names(resp),names(pred)))
+  for (i in 1:length(resp)){
+  for (k in 1:length(pred)){
+    cor.array[i,k] <- cor(resp[[i]],pred[[k]])
+    plot(resp[[i]], pred[[k]], xlab = names(resp[i]))
+  }
+  }
+  
+  return(cor.array)
+}
+```
+
+```{r}
+cor.all.lin(Del.response, Del.pred)
+
+```
+
