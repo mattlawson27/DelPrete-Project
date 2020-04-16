@@ -9,6 +9,8 @@ library(mosaic)
 
 
 ```{r}
+library(readxl)
+
 DelPrete <- read_excel("Delprete.xlsx")
 
 # Changning data into a data frame
@@ -389,9 +391,7 @@ lines(smooth.spline(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet)
 
 ```
 
-```{r}
-install.packages("mgcv")
-```
+
 
 ```{r}
 library(mgcv)
@@ -600,19 +600,37 @@ names(Del.pred)
 ```{r}
 ?array
 
-cor.array <- array(dim = c(length(x),length(y)))
+
 cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
 ```
 
 ```{r}
 descrip.Del <- function(resp,pred){
-  descriptives <- list()
+  
+  favstats.names <- list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n")
+  descrip.array <- array(dim = c(length(resp),length(favstats.names)), dimnames = list(names(resp),favstats.names))
   for (i in 1:length(resp)){
-    descriptives[i] <- favstats(resp[[i]])
-    hist(resp[[i]], xlab = names(resp[i]))
+
+    descrip.array[i,1] <- favstats(resp[[i]])$min
+    descrip.array[i,2] <- favstats(resp[[i]])$Q1
+    descrip.array[i,3] <- favstats(resp[[i]])$median
+    descrip.array[i,4] <- favstats(resp[[i]])$Q3
+    descrip.array[i,5] <- favstats(resp[[i]])$max
+    descrip.array[i,6] <- favstats(resp[[i]])$mean
+    descrip.array[i,7] <- favstats(resp[[i]])$sd
+    descrip.array[i,8] <- favstats(resp[[i]])$n
+    
+    gf_dhistogram(~ resp[[i]]) %>%
+               gf_fitdistr(dist = "norm")
+    
+    hist(resp[[i]], xlab = names(resp[i]), freq = FALSE) %>%
+               gf_fitdistr(dist = "norm")
+     
   }
+  return(descrip.array)
 }
 ```
+
 
 
 
@@ -622,7 +640,7 @@ cor.all.lin <- function(resp,pred) {
   for (i in 1:length(resp)){
   for (k in 1:length(pred)){
     cor.array[i,k] <- cor(resp[[i]],pred[[k]])
-    plot(resp[[i]], pred[[k]], xlab = names(resp[i]))
+    plot(resp[[i]], pred[[k]], xlab = names(resp[i]), ylab = names(pred[k]))
   }
   }
   
@@ -634,4 +652,88 @@ cor.all.lin <- function(resp,pred) {
 cor.all.lin(Del.response, Del.pred)
 
 ```
+
+```{r}
+DelPrete.orig <- DelpreteOriginalData
+
+
+
+for (i in 1:length(DelPrete.orig$Gender)) {
+  if (DelPrete.orig$Gender[i] == "male" || DelPrete.orig$Gender[i] == "Male"){
+    DelPrete.orig$Gender[i] <- "M"
+  } else if (DelPrete.orig$Gender[i] == "female" || DelPrete.orig$Gender[i] == "Female"){
+    
+    DelPrete.orig$Gender[i] <- "F"
+  }
+  
+}
+for (i in 1:length(DelPrete.orig$Ethnicity)) {
+  if (DelPrete.orig$Ethnicity[i] == "white" || DelPrete.orig$Ethnicity[i] == "white"){
+    DelPrete.orig$Ethnicity[i] <- "W"
+  } else if (DelPrete.orig$Ethnicity[i] == "black" || DelPrete.orig$Ethnicity[i] == "Black") {
+    DelPrete.orig$Ethnicity[i] <- "B"
+  }
+  
+}
+
+DelPrete.orig$`femur head diameter`[498]
+mean(as.numeric(DelPrete.orig$`femur head diameter`))
+DelPrete.orig$`femur head diameter`[498] <- mean(DelPrete.orig$`femur head diameter`)
+
+View(DelPrete.orig)
+```
+
+```{r}
+
+DelPrete.orig.F <- subset(DelPrete.orig, Gender == "F")
+DelPrete.orig.M <- subset(DelPrete.orig, Gender == "M")
+
+View(DelPrete.orig.F)
+View(DelPrete.orig.M)
+```
+
+```{r}
+Del.orig.resp <- list(AP.Inlet = DelPrete.orig$`Anteroposterior diameter of the inlet`, AP.Outlet = DelPrete.orig$`Anterioposterior space of outlet adj`, Bispinous = DelPrete.orig$`Bi-spinous diameter`, Pelvic.Breadth = DelPrete.orig$`Pelvic breadth`, TD.Outlet = DelPrete.orig$`Transverse diameter of the outlet`)
+
+DelPrete.orig$Femur.Head.Adj <- DelPrete.orig$`femur head diameter`^1.715
+
+Del.orig.pred <- list(Femur.Head.Adj = DelPrete.orig$Femur.Head.Adj)
+
+Del.orig.resp.F <- list(AP.Inlet = DelPrete.orig.F$`Anteroposterior diameter of the inlet`, AP.Outlet = DelPrete.orig.F$`Anterioposterior space of outlet adj`, Bispinous = DelPrete.orig.F$`Bi-spinous diameter`, Pelvic.Breadth = DelPrete.orig.F$`Pelvic breadth`, TD.Outlet = DelPrete.orig.F$`Transverse diameter of the outlet`)
+
+DelPrete.orig.F$Femur.Head.Adj <- DelPrete.orig.F$`femur head diameter`^1.715
+
+Del.orig.pred.F <- list(Femur.Head.Adj = DelPrete.orig.F$Femur.Head.Adj)
+```
+
+```{r}
+
+descrip.Del(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
+```
+
+```{r}
+
+gf_dhistogram(~ Del.orig.resp.F[[1]]) %>%
+               gf_fitdistr(dist = "norm")
+gf_dhistogram(~ Del.orig.resp.F[[2]]) %>%
+               gf_fitdistr(dist = "norm")
+gf_dhistogram(~ Del.orig.resp.F[[3]]) %>%
+               gf_fitdistr(dist = "norm")
+gf_dhistogram(~ Del.orig.resp.F[[4]]) %>%
+               gf_fitdistr(dist = "norm")
+gf_dhistogram(~ Del.orig.resp.F[[5]]) %>%
+               gf_fitdistr(dist = "norm")
+
+```
+
+```{r}
+cor(Del.orig.resp.F[[1]], Del.orig.pred.F[[1]])
+plot(Del.orig.resp.F[[1]], Del.orig.pred.F[[1]])
+```
+
+
+```{r}
+cor.all.lin(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
+```
+
 
