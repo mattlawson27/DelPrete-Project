@@ -26,8 +26,8 @@ library(mosaic)
 ```
 
 ```{r}
-DelPrete <- Delprete
-DelPreteTW <- subset(DelPreteTW, Collection_number !=1)
+
+DelPreteTW <- subset(DelPrete, Collection_number !=1)
 DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
 DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
 

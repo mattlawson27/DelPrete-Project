@@ -3,8 +3,10 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+
 ```{r}
 library(mosaic)
+library(car)
 ```
 
 
@@ -597,18 +599,13 @@ names(Del.response)
 names(Del.pred)
 ```
 
-```{r}
-?array
 
-
-cor(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
-```
 
 ```{r}
 descrip.Del <- function(resp,pred){
   
-  favstats.names <- list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n")
-  descrip.array <- array(dim = c(length(resp),length(favstats.names)), dimnames = list(names(resp),favstats.names))
+  favstats.names <- list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n", "CV")
+  descrip.array <- array(dim = c(length(resp),length(favstats.names)), dimnames = list(names(resp),list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n", "CV")))
   for (i in 1:length(resp)){
 
     descrip.array[i,1] <- favstats(resp[[i]])$min
@@ -619,18 +616,13 @@ descrip.Del <- function(resp,pred){
     descrip.array[i,6] <- favstats(resp[[i]])$mean
     descrip.array[i,7] <- favstats(resp[[i]])$sd
     descrip.array[i,8] <- favstats(resp[[i]])$n
-    
-    gf_dhistogram(~ resp[[i]]) %>%
-               gf_fitdistr(dist = "norm")
-    
-    hist(resp[[i]], xlab = names(resp[i]), freq = FALSE) %>%
-               gf_fitdistr(dist = "norm")
-     
+    descrip.array[i,9] <- favstats(resp[[i]])$sd/favstats(resp[[i]])$mean
+  
+     hist(resp[[i]], xlab = names(resp[i]))
   }
   return(descrip.array)
 }
 ```
-
 
 
 
@@ -640,7 +632,7 @@ cor.all.lin <- function(resp,pred) {
   for (i in 1:length(resp)){
   for (k in 1:length(pred)){
     cor.array[i,k] <- cor(resp[[i]],pred[[k]])
-    plot(resp[[i]], pred[[k]], xlab = names(resp[i]), ylab = names(pred[k]))
+    plot(resp[[i]], pred[[k]], xlab = names(resp[i]))
   }
   }
   
@@ -653,9 +645,32 @@ cor.all.lin(Del.response, Del.pred)
 
 ```
 
+## Raw data
+
 ```{r}
 DelPrete.orig <- DelpreteOriginalData
 
+TE <- seq(from =4, to=4, length.out=208)
+HT <- seq(from =3, to=3, length.out=240)
+C <- seq(from =2, to=2, length.out =155)
+S <- seq(from =1, to=1, length.out=68)
+
+Collection <- c(TE,C,S,HT)
+DelPrete.orig$Collection <- Collection
+
+for (i in 1:length(DelPrete.orig$Collection)) {
+  if (DelPrete.orig$Collection[i] == 1){
+    DelPrete.orig$Location[i] <- "S"
+  }else if (DelPrete.orig$Collection[i] == 2){
+    DelPrete.orig$Location[i] <- "C"
+  }else if (DelPrete.orig$Collection[i] == 3){
+    DelPrete.orig$Location[i] <- "HT"
+  }else if (DelPrete.orig$Collection[i] == 4){
+    DelPrete.orig$Location[i] <- "T"
+  }
+}
+
+DelPrete.orig <- subset(DelPrete.orig, `femur head diameter` != "NA")
 
 
 for (i in 1:length(DelPrete.orig$Gender)) {
@@ -676,21 +691,19 @@ for (i in 1:length(DelPrete.orig$Ethnicity)) {
   
 }
 
-DelPrete.orig$`femur head diameter`[498]
-mean(as.numeric(DelPrete.orig$`femur head diameter`))
-DelPrete.orig$`femur head diameter`[498] <- mean(DelPrete.orig$`femur head diameter`)
 
 View(DelPrete.orig)
 ```
 
 ```{r}
-
 DelPrete.orig.F <- subset(DelPrete.orig, Gender == "F")
 DelPrete.orig.M <- subset(DelPrete.orig, Gender == "M")
 
 View(DelPrete.orig.F)
 View(DelPrete.orig.M)
 ```
+
+### Descriptives
 
 ```{r}
 Del.orig.resp <- list(AP.Inlet = DelPrete.orig$`Anteroposterior diameter of the inlet`, AP.Outlet = DelPrete.orig$`Anterioposterior space of outlet adj`, Bispinous = DelPrete.orig$`Bi-spinous diameter`, Pelvic.Breadth = DelPrete.orig$`Pelvic breadth`, TD.Outlet = DelPrete.orig$`Transverse diameter of the outlet`)
@@ -703,7 +716,7 @@ Del.orig.resp.F <- list(AP.Inlet = DelPrete.orig.F$`Anteroposterior diameter of 
 
 DelPrete.orig.F$Femur.Head.Adj <- DelPrete.orig.F$`femur head diameter`^1.715
 
-Del.orig.pred.F <- list(Femur.Head.Adj = DelPrete.orig.F$Femur.Head.Adj)
+Del.orig.pred <- list(Femur.Head.Adj = DelPrete.orig.F$Femur.Head.Adj)
 ```
 
 ```{r}
@@ -711,29 +724,98 @@ Del.orig.pred.F <- list(Femur.Head.Adj = DelPrete.orig.F$Femur.Head.Adj)
 descrip.Del(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
 ```
 
+
+### ANOVA
+
+```{r}
+cor.test(DelPrete.orig$`Anteroposterior diameter of the inlet`, DelPrete.orig$Femur.Head.Adj)
+```
+
 ```{r}
 
-gf_dhistogram(~ Del.orig.resp.F[[1]]) %>%
-               gf_fitdistr(dist = "norm")
-gf_dhistogram(~ Del.orig.resp.F[[2]]) %>%
-               gf_fitdistr(dist = "norm")
-gf_dhistogram(~ Del.orig.resp.F[[3]]) %>%
-               gf_fitdistr(dist = "norm")
-gf_dhistogram(~ Del.orig.resp.F[[4]]) %>%
-               gf_fitdistr(dist = "norm")
-gf_dhistogram(~ Del.orig.resp.F[[5]]) %>%
-               gf_fitdistr(dist = "norm")
+model<-glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model, test="F"
+               )
+results
+
+
+```
+
+The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+
+```{r}
+library(reshape2)
+library(broom)
+
+?TukeyHSD
+model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
+as.data.frame(tidy(model.Tuk)) %>%
+    filter(adj.p.value < .05)
+model.Tuk
+```
+
+```{r}
+cor.test(DelPrete.orig$`Pelvic breadth`, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+
+model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model, test="F"
+               )
+results
+
+
+```
+
+The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+
+```{r}
+library(reshape2)
+library(broom)
+model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
+as.data.frame(tidy(model.Tuk)) %>%
+    filter(adj.p.value < .05)
+model.Tuk
+```
+
+### MANOVA
+
+```{r}
+
+
+results<-manova(cbind(DelPrete.orig$`Anteroposterior diameter of the inlet`,  DelPrete.orig$`Pelvic breadth`, DelPrete.orig$`Anterioposterior space of outlet adj`, DelPrete.orig$`Bi-spinous diameter`, DelPrete.orig$`Transverse diameter of the outlet`) ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+summary.aov(results)
+
 
 ```
 
 ```{r}
-cor(Del.orig.resp.F[[1]], Del.orig.pred.F[[1]])
-plot(Del.orig.resp.F[[1]], Del.orig.pred.F[[1]])
+?Manova
+
+
+
+model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Manova(model, test.statistic="F"
+               )
+results
+
+
 ```
 
 
-```{r}
-cor.all.lin(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
-```
+
+
+
+
+
+
+
+
+
+
 
 
