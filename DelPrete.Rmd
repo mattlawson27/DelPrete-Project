@@ -186,12 +186,12 @@ plot(DelPreteT$Index_bispinous, DelPreteT$GM)
 
 # Correlation Function
 ```{r}
-cor.index <- function(x,y=Delprete$femur_head_adjusted_1.715) {
+cor.index <- function(x,y) {
   nlc <- vector()
   c <- vector()
   Cor.list <- list(nlc, c)
   for (i in 1:length(x)){
-    Cor.list$nlc[i] <- c(nlCor(x[[i]],y, method = "log"), nlCor(x[[i]],y, method="poly"), nlCor(x[[i]],y, method = "expo"))
+    Cor.list$nlc[i] <- c(nlCor(x[[i]],y, method = "log", n=3), nlCor(x[[i]],y, method="poly", n=3), nlCor(x[[i]],y, method = "expo", n=3))
     Cor.list$c[i] <- cor(x[[i]],y)
   }
   return(Cor.list)
@@ -204,6 +204,7 @@ x <- list(Delprete$Index_bispinous, Delprete$Index_AP_inlet, Delprete$Index_AP_o
 
 cor.index(x, y=Delprete$femur_head_adjusted_1.715)
 cor.index(x, y=Delprete$GM)
+
 ```
 
 ## Cor of T Collection
