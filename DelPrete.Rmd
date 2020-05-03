@@ -9,6 +9,7 @@ output: html_notebook
 
 ```{r}
 library(mosaic)
+
 ```
 
 
@@ -26,8 +27,8 @@ library(mosaic)
 ```
 
 ```{r}
-DelPrete <- Delprete
-DelPreteTW <- subset(DelPreteTW, Collection_number !=1)
+
+DelPreteTW <- subset(DelPrete, Collection_number !=1)
 DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
 DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
 
@@ -158,7 +159,7 @@ wilcox.test(DelPreteT$Index_AP_outlet ~ DelPreteT$Ethnicity)
 ```
 
 
-For the Wilcoxson-Signed Rank Test we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection and therefore there is a difference between the two groups.
+For the Mann Whitney U test we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection and therefore there is a difference between the two groups.
 
 
 
@@ -238,4 +239,5 @@ C <- list(DelPreteC$Index_bispinous, DelPreteC$Index_AP_inlet,DelPreteC$Index_AP
 cor.index(C, y=DelPreteC$femur_head_adjusted_1.715)
 cor.index(C, y=DelPreteC$GM)
 ```
+
 
