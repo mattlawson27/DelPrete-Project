@@ -1,4 +1,0 @@
----
-title: "DelPrete Project"
-output: html_notebook
----
