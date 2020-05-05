@@ -10,6 +10,7 @@ output: html_notebook
 library(mosaic)
 library(car)
 library(multcomp)
+library(lsmeans)
 ```
 
 
@@ -882,11 +883,11 @@ Anova(model.TDOutlet, type="III")
 ```
 
 ```{r}
-summary.lm(model.APOutlet)
+summary.lm(model.TDOutlet)
 ```
 
 ```{r}
-postHocs<-glht(model.APOutlet, linfct = mcp(LocationR = "Tukey"))
+postHocs<-glht(model.TDOutlet, linfct = mcp(LocationR = "Tukey"))
 summary(postHocs)
 ```
 
@@ -894,7 +895,7 @@ summary(postHocs)
 confint(postHocs)
 ```
 
-#### TD OUTLET
+#### PELVIC BREADTH
 
 ```{r}
 cor.test(DelPrete.orig$PelvicBreadth, DelPrete.orig$Femur.Head.Adj)
@@ -919,159 +920,17 @@ summary(postHocs)
 confint(postHocs)
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
+posthocattempt<-lsmeans(model.PelvicBreadth, pairwise ~ Gender:LocationR, adjust = "Tukey")
 
-model.APInlet<-aov(DelPrete.orig$APInlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
-
-results<-Anova(model.APInlet, test="F"
-               )
-results
-
+posthocattempt$contrasts
 
 ```
 
 
 
-```{r}
-postHocs <- glht(model = model.APInlet)
-summary(postHocs)
-```
 
-```{r}
-confint(postHocs)
-```
-
-```{r}
-cor.test(DelPrete.orig$APOutlet, DelPrete.orig$Femur.Head.Adj)
-```
-
-```{r}
-
-model.APOutlet<-aov(DelPrete.orig$APOutlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
-
-results<-Anova(model.APOutlet, test="F"
-               )
-results
-
-
-```
-
-
-
-```{r}
-postHocs <- glht(model = model.APOutlet)
-summary(postHocs)
-```
-
-```{r}
-confint(postHocs)
-```
-
-```{r}
-cor.test(DelPrete.orig$Bispinous, DelPrete.orig$Femur.Head.Adj)
-```
-
-```{r}
-
-model.Bispinous<-aov(DelPrete.orig$Bispinous ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
-
-results<-Anova(model.Bispinous, test="F"
-               )
-results
-
-
-```
-
-
-
-```{r}
-postHocs <- glht(model = model.Bispinous)
-summary(postHocs)
-```
-
-```{r}
-confint(postHocs)
-```
-
-```{r}
-
-cor.test(DelPrete.orig$TDOutlet, DelPrete.orig$Femur.Head.Adj)
-
-```
-
-
-```{r}
-
-model.TDOutlet<-aov(DelPrete.orig$TDOutlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
-
-results<-Anova(model.TDOutlet, test="F"
-               )
-results
-
-
-```
-
-
-
-```{r}
-postHocs <- glht(model = model.TDOutlet)
-summary(postHocs)
-```
-
-```{r}
-confint(postHocs)
-```
-
-```{r}
-cor.test(DelPrete.orig$PelvicBreadth, DelPrete.orig$Femur.Head.Adj)
-```
-
-```{r}
-
-model.PelvicBreadth<-aov(DelPrete.orig$PelvicBreadth ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
-
-results<-Anova(model.PelvicBreadth, test="F"
-               )
-results
-
-
-```
-
-```{r}
-
-model.PelvicBreadth<-aov(PelvicBreadth ~ Gender * LocationR + Femur.Head.Adj, data = DelPrete.orig)
-
-results<-Anova(model.PelvicBreadth, test="F"
-               )
-results
-
-summary.lm(model.PelvicBreadth)
-
-```
-
-```{r}
-postHocs <- glht(model = model.PelvicBreadth, linfct = mcp(LocationR = "Tukey"))
-summary(postHocs)
-```
-
-```{r}
-confint(postHocs)
-```
-
-## MANCOVA
+### MANCOVA
 
 ```{r}
 

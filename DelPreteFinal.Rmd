@@ -1,0 +1,365 @@
+---
+title: "DelPrete Final"
+Author: Sam Colucci and Matt Lawson
+output: html_notebook
+---
+
+# Packages
+
+```{r}
+library(readxl)
+library(mosaic)
+library(car)
+library(multcomp)
+library(lsmeans)
+```
+
+# Adjusted Data
+
+```{r}
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+```
+
+## Subsetting
+
+```{r}
+# Subsetting the data so its just the Terry Collection
+
+DelPreteT <- subset(DelPrete, Collection_number != 1)
+DelPreteT <- subset(DelPreteT, Collection_number != 2)
+DelPreteT <- subset(DelPreteT, Collection_number != 3)
+```
+
+```{r}
+# Subsetting the data so its just the White Terry Collection
+
+DelPreteTW <- subset(DelPrete, Collection_number !=1)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=2)
+DelPreteTW <- subset(DelPreteTW, Collection_number !=3)
+```
+
+
+## AP Inlet
+
+```{r}
+hist(DelPreteT$Index_AP_inlet, xlab = "AP Inlet", main="Histogram of AP Inlet")
+
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Inlet", ylab="Femur Head Adjusted", main ="AP Inlet vs. Femur Head")
+
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## TD Outlet
+
+```{r}
+hist(DelPreteT$Index_TD_outlet, xlab="TD Outlet", main="Histogram of TD Outlet")
+
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "TD Outlet", ylab="Femur Head Adjusted", main ="TD Outlet vs. Femur Head")
+
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## Bispinous
+
+```{r}
+hist(DelPreteT$Index_bispinous, xlab = "Bispinous", main="Histogram of Bispinous")
+
+plot(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715, xlab = "Bispinous", ylab="Femur Head Adjusted", main ="Bispinous vs. Femur Head")
+
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## Pelvic Breadth
+```{r}
+hist(DelPreteT$Index_pelvic_breadth, xlab = "Pelvic Breadth", main = "Histogram of Pelvic Breadth")
+
+plot(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715, xlab = "Pelvic Breadth", ylab="Femur Head Adjusted", main ="Pelvic Breadth vs. Femur Head")
+
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## AP Outlet
+```{r}
+hist(DelPreteT$Index_AP_outlet, xlab ="AP Outlet", main ="Histogram of AP Outlet")
+
+plot(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715, xlab = "AP Outlet", ylab="Femur Head Adjusted", main ="AP Outlet vs. Femur Head")
+
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+
+# Raw data
+
+```{r}
+DelpreteOriginalData <- read_excel("DelpreteOriginalData.xlsx", 
+    sheet = "all data")
+
+# Changning data into a data frame
+
+DelpreteOriginalData <- as.data.frame(DelpreteOriginalData)
+```
+
+```{r}
+# Changing the collection numbers into Locations
+
+DelPrete.orig <- DelpreteOriginalData
+
+TE <- seq(from =4, to=4, length.out=208)
+HT <- seq(from =3, to=3, length.out=240)
+C <- seq(from =2, to=2, length.out =155)
+S <- seq(from =1, to=1, length.out=68)
+
+Collection <- c(TE,C,S,HT)
+DelPrete.orig$Collection <- Collection
+DelPrete.orig$Location <- DelPrete.orig$Collection
+
+for (i in 1:length(DelPrete.orig$Collection)) {
+  if (DelPrete.orig$Collection[i] == 1){
+    DelPrete.orig$Location[i] <- "S"
+  }else if (DelPrete.orig$Collection[i] == 2){
+    DelPrete.orig$Location[i] <- "C"
+  }else if (DelPrete.orig$Collection[i] == 3){
+    DelPrete.orig$Location[i] <- "HT"
+  }else if (DelPrete.orig$Collection[i] == 4){
+    DelPrete.orig$Location[i] <- "T"
+  }
+}
+
+```
+
+```{r}
+# Removing a missing data point
+DelPrete.orig <- subset(DelPrete.orig, `femur head diameter` != "NA")
+```
+
+```{r}
+# Cleaning up the data
+# Changing Gender Column so there it's only M or F
+
+for (i in 1:length(DelPrete.orig$Gender)) {
+  if (DelPrete.orig$Gender[i] == "male" || DelPrete.orig$Gender[i] == "Male"){
+    DelPrete.orig$Gender[i] <- "M"
+  } else if (DelPrete.orig$Gender[i] == "female" || DelPrete.orig$Gender[i] == "Female"){
+    
+    DelPrete.orig$Gender[i] <- "F"
+  }
+}
+```
+
+```{r}
+# Cleaning up the data
+# Changing Ethnicity Column so there it's only W or B
+
+
+for (i in 1:length(DelPrete.orig$Ethnicity)) {
+  if (DelPrete.orig$Ethnicity[i] == "white" || DelPrete.orig$Ethnicity[i] == "white"){
+    DelPrete.orig$Ethnicity[i] <- "W"
+  } else if (DelPrete.orig$Ethnicity[i] == "black" || DelPrete.orig$Ethnicity[i] == "Black") {
+    DelPrete.orig$Ethnicity[i] <- "B"
+  }
+  
+}
+
+```
+
+```{r}
+# Combining the Locations and Ethnicities
+
+DelPrete.orig$LocationR <- DelPrete.orig$Location
+
+for (i in 1:length(DelPrete.orig$Location)) {
+  if (DelPrete.orig$Location[i] == "S" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "SW"
+  }else if (DelPrete.orig$Location[i] == "T" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "TW"
+  }else if (DelPrete.orig$Location[i] == "T" && DelPrete.orig$Ethnicity[i] == "B" ){
+    DelPrete.orig$LocationR[i] <- "TB"
+  }else if (DelPrete.orig$Location[i] == "HT" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "HTW"
+  }else if (DelPrete.orig$Location[i] == "HT" && DelPrete.orig$Ethnicity[i] == "B" ){
+    DelPrete.orig$LocationR[i] <- "HTB"
+  }else if (DelPrete.orig$Location[i] == "C" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "CW"
+  }
+}
+
+View(DelPrete.orig)
+```
+
+
+
+```{r}
+# Making the predictors into factors for ANCOVA later
+DelPrete.orig$Gender <- as.factor(DelPrete.orig$Gender)
+DelPrete.orig$LocationR <- as.factor(DelPrete.orig$LocationR)
+str(DelPrete.orig)
+```
+
+
+
+
+
+## Renaming
+
+```{r}
+
+# Renaming the variables used to simplify the code
+
+DelPrete.orig$Femur.Head.Adj <- DelPrete.orig$`femur head diameter`^1.715
+DelPrete.orig$APInlet <- DelPrete.orig$`Anteroposterior diameter of the inlet`
+DelPrete.orig$PelvicBreadth <- DelPrete.orig$`Pelvic breadth`
+DelPrete.orig$Bispinous <- DelPrete.orig$`Bi-spinous diameter`
+DelPrete.orig$TDOutlet <- DelPrete.orig$`Transverse diameter of the outlet`
+DelPrete.orig$APOutlet <- DelPrete.orig$`Anterioposterior space of outlet adj`
+```
+
+## Histograms
+
+```{r}
+hist(DelPrete.orig$APInlet, xlab = "AP Inlet", main = "AP Inlet", col = "gray")
+hist(DelPrete.orig$Bispinous, xlab = "Bispinous", main = "Bispinous", col = "tan")
+hist(DelPrete.orig$TDOutlet, xlab = "TD Outlet", main = "TD Outlet", col = "navy")
+hist(DelPrete.orig$PelvicBreadth, xlab = "Pelvic Breadth", main = "Pelvic Breadth", col = "purple")
+hist(DelPrete.orig$APOutlet, xlab = "AP Outlet", main = "AP Outlet", col = "dark green")
+```
+
+
+## ANCOVA
+
+### AP INLET
+
+```{r}
+cor.test(DelPrete.orig$APInlet, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.APInlet<-aov(APInlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.APInlet, type="III")
+```
+
+```{r}
+summary.lm(model.APInlet)
+```
+
+```{r}
+postHocs<-glht(model.APInlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+### AP OUTLET
+
+```{r}
+cor.test(DelPrete.orig$APOutlet, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.APOutlet<-aov(APOutlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.APOutlet, type="III")
+```
+
+```{r}
+summary.lm(model.APOutlet)
+```
+
+```{r}
+postHocs<-glht(model.APOutlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+### Bispinous
+
+```{r}
+cor.test(DelPrete.orig$Bispinous, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.Bispinous<-aov(Bispinous ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.Bispinous, type="III")
+```
+
+```{r}
+summary.lm(model.Bispinous)
+```
+
+```{r}
+postHocs<-glht(model.Bispinous, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+### TD OUTLET
+
+```{r}
+cor.test(DelPrete.orig$TDOutlet, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.TDOutlet<-aov(TDOutlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.TDOutlet, type="III")
+```
+
+```{r}
+summary.lm(model.TDOutlet)
+```
+
+```{r}
+postHocs<-glht(model.TDOutlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+### PELVIC BREADTH
+
+```{r}
+cor.test(DelPrete.orig$PelvicBreadth, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.PelvicBreadth<-aov(PelvicBreadth ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.PelvicBreadth, type="III")
+```
+
+```{r}
+summary.lm(model.PelvicBreadth)
+```
+
+```{r}
+postHocs<-glht(model.PelvicBreadth, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+```{r}
+posthocinteractions<-lsmeans(model.PelvicBreadth, pairwise ~ Gender:LocationR, adjust = "Tukey")
+
+posthocinteractions$contrasts
+
+```
+
+
