@@ -3,16 +3,819 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+library(mosaic)
+library(car)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+```{r}
+library(readxl)
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+
+DelPreteTW <- subset(DelPrete, Collection_number != 1)
+DelPreteTW <- subset(DelPreteTW, Collection_number != 2)
+DelPreteTW <- subset(DelPreteTW, Collection_number != 3)
+DelPreteTW <- subset(DelPreteTW, Ethnicity != "B")
+
+View(DelPreteTW)
+
+```
+
+
+
+## Histograms 
+
+```{r}
+# Histgrams of the different responses
+
+hist(DelPrete$Index_AP_inlet, xlab = "AP Inlet", main = "AP Inlet")
+hist(DelPrete$Index_bispinous, xlab = "Bispinous", main = "Bispinous")
+hist(DelPrete$Index_TD_outlet, xlab = "TD Outlet", main = "TD Outlet")
+```
+
+```{r}
+# Histgrams of the different responses
+
+hist(DelPreteTW$Index_AP_inlet, xlab = "AP Inlet", main = "AP Inlet")
+hist(DelPreteTW$Index_bispinous, xlab = "Bispinous", main = "Bispinous")
+hist(DelPreteTW$Index_TD_outlet, xlab = "TD Outlet", main = "TD Outlet")
+```
+
+```{r}
+# Histogtrams for predictor variables
+
+hist(DelPreteTW$GM) # Geometric mean of pelvic size
+hist(DelPreteTW$femur_head_adjusted_1.715) # Size of femur head, used to estimate pelvic size 
+hist(DelPreteTW$three_groups) # Three groups for year of death, Terry collection did not have any pelvic bones from the 1933 group
+```
+
+
+
+
+
+## Favstats for mean, standard deviation, etc
+
+```{r}
+library(mosaic) # For favstats
+
+
+# Responses
+
+favstats(DelPreteTW$Index_AP_inlet)
+favstats(DelPreteTW$Index_bispinous)
+favstats(DelPreteTW$Index_TD_outlet)
+```
+
+```{r}
+
+# Predictors
+
+favstats(DelPreteTW$GM)
+favstats(DelPreteTW$femur_head_adjusted_1.715)
+favstats(DelPreteTW$Birthdate)
+```
+
+
+
+## Scatter plots between Responses and predictors
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$GM, xlab = "AP Inlet", ylab = "Geometric Mean")
+plot(DelPreteTW$Index_bispinous, DelPreteTW$GM, xlab = "Bispinous", ylab = "Geometric Mean")
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$GM, xlab = "TD Outlet", ylab = "Geometric Mean")
+```
+
+```{r}
+# Scatter plots comparing responses with birth year
+
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$Birthdate)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$Birthdate)
+```
+
+```{r}
+# Death year
+
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$date_of_death)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$date_of_death)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$date_of_death)
+```
+
+## Correlations
+
+```{r}
+
+# Correlation between responses and Geometric Means
+
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$GM)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$GM)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$GM)
+
+```
+
+```{r}
+
+# Correlation between responses and femur head adjusted
+
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+# 02 26 2020
+
+## Box Plots
+
+```{r}
+boxplot(DelPreteTW$Index_AP_inlet, main = "AP Inlet")
+boxplot(DelPreteTW$Index_bispinous, main = "Bispinous")
+boxplot(DelPreteTW$Index_TD_outlet, main = "TD Outlet")
+```
+
+
+
+# 02 27 2020
+
+## Correlations between death year and pelvic size
+
+```{r}
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$date_of_death)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$date_of_death)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$date_of_death)
+
+```
+
+Correlations are very low. Repsonses are not correlated with the response variables.
+
+```{r}
+cor(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+cor(DelPreteTW$Index_bispinous, DelPreteTW$Birthdate)
+cor(DelPreteTW$Index_TD_outlet, DelPreteTW$Birthdate)
+```
+
+Birth year and response variables are not correlated at all. Nice.
+
+
+```{r}
+Pelvic.cor <- function(a, b) {
+  a <- a
+  b <- b
+  p.cor <- cor(a, b)
+  
+  return(p.cor)
+}
+
+Pelvic.cor(DelPreteTW$Index_AP_inlet, DelPreteTW$Birthdate)
+```
+
+# 03 02 2020
+
+## LN transformation of data for correlation
+
+```{r}
+?log
+DelPreteTW$LnGM <- log(DelPreteTW$GM)
+DelPreteTW$LnFemur <- log(DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## Plots
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$LnGM)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$LnGM)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$LnGM)
+```
+
+```{r}
+plot(DelPreteTW$Index_AP_inlet, DelPreteTW$LnFemur)
+plot(DelPreteTW$Index_bispinous, DelPreteTW$LnFemur)
+plot(DelPreteTW$Index_TD_outlet, DelPreteTW$LnFemur)
+```
+
+
+## Correlation
+
+```{r}
+cor(DelPreteTW$LnGM, DelPreteTW$Index_AP_inlet)
+cor(DelPreteTW$LnGM, DelPreteTW$Index_bispinous)
+cor(DelPreteTW$LnGM, DelPreteTW$Index_TD_outlet)
+```
+
+
+```{r}
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_AP_inlet)
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_bispinous)
+cor(DelPreteTW$LnFemur, DelPreteTW$Index_TD_outlet)
+```
+
+Transforming the data with a natural log transformation did not improve the correlations. This is very unfortunate. Dr. DelPrete want us to see if there was correlation between the responses and the predictors but we have not found any even with the transformations. 
+
+
+
+# 03 05 2020
+
+New responses: Pelvic Breadth and AP Outlet
+
+## More Correlations
+
+```{r}
+# Correlations between responses and Geometric Mean
+
+cor(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
+cor(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
+```
+
+
+```{r}
+# Correlations between responses and femur head adjusted
+
+cor(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
+cor(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+
+
+
+# 03 24 2020
+
+## Correlation Tests
+
+```{r}
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$GM)
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$GM)
+```
+
+```{r}
+
+cor.test(DelPreteTW$Index_AP_inlet, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_bispinous, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_TD_outlet, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_pelvic_breadth, DelPreteTW$femur_head_adjusted_1.715)
+cor.test(DelPreteTW$Index_AP_outlet, DelPreteTW$femur_head_adjusted_1.715)
+```
+
+## T tests and Wilcoxon Signed Rank Tests
+
+Restoring the data set to the Terry Collection with both genders.
+
+```{r}
+DelPrete <- read_excel("Delprete.xlsx")
+
+# Changning data into a data frame
+
+DelPrete <- as.data.frame(DelPrete)
+
+DelPreteT <- subset(DelPrete, Collection_number != 1)
+DelPreteT <- subset(DelPreteT, Collection_number != 2)
+DelPreteT <- subset(DelPreteT, Collection_number != 3)
+```
+
+
+```{r}
+hist(DelPreteT$Index_AP_inlet)
+hist(DelPreteT$Index_bispinous)
+hist(DelPreteT$Index_TD_outlet)
+hist(DelPreteT$Index_pelvic_breadth)
+hist(DelPreteT$Index_AP_outlet)
+```
+
+The AP Inlet and Pelvic Breadth index values are the only two which is normally distributed, so we can use a t test. The responses are not normally distributed so we have to use a non parametric test.
+
+```{r}
+?t.test
+t.test(DelPreteT$Index_AP_inlet ~ DelPreteT$Ethnicity)
+t.test(DelPreteT$Index_pelvic_breadth ~ DelPreteT$Ethnicity)
+```
+
+Since the p-value for the AP Inlet is greater than 0.05 we cannot conclude that there is a statistical difference between the mean AP Inlet index value of the races of the Terry collection.
+Since the p-value for the Pelvic Breadth is less than 0.05 we can conclude that there is a statistical difference between the mean Pelvic Breadth index value of the races of the Terry collection.
+
+```{r}
+
+wilcox.test(DelPreteT$Index_bispinous ~ DelPreteT$Ethnicity)
+wilcox.test(DelPreteT$Index_TD_outlet ~ DelPreteT$Ethnicity)
+wilcox.test(DelPreteT$Index_AP_outlet ~ DelPreteT$Ethnicity)
+```
+
+For the Bispinous and the TD Outlet index values we see that the p-value is greater than 0.05 so we cannot conclude that the ranks for each index value are different, respectively.
+For the AP Outlet index value we see that the p-value is less than 0.05 so we can conclude that there is a difference in the ranks of the two races in the Terry collection.
+
+```{r}
+hist(DelPrete$Index_AP_inlet)
+hist(DelPrete$Index_bispinous)
+hist(DelPrete$Index_TD_outlet)
+hist(DelPrete$Index_pelvic_breadth)
+hist(DelPrete$Index_AP_outlet)
+```
+
+# 04 02 20
+
+## New Correlations, non linear
+
+
+```{r}
+#' Computes the rank correlation between to samples
+#' @param x vector containing the first sample of data
+#' @param y vector containing the second sample of data
+#'
+#' @return the rank correlation
+
+rankcor <- function(x, y){
+  n <- length(x)
+  stopifnot(length(y) == n)
+  
+  x.ranks <- rank(x)
+  y.ranks <- rank(y)
+  
+  covariance.term <- cov(x.ranks, y.ranks)
+  
+  sd.x <- sqrt((((n^2)-1)/12)*(n/(n-1)))
+  sd.y <- sqrt((((n^2)-1)/12)*(n/(n-1)))
+  
+  rank.cor <- covariance.term / (sd.x*sd.y)
+  
+  
+  return(rank.cor)
+}
+```
+
+
+
+```{r}
+rankcor(DelPreteT$Index_bispinous, DelPreteT$GM)
+```
+
+
+```{r}
+cor(DelPrete$Index_bispinous, DelPrete$GM)
+
+plot(DelPrete$Index_bispinous, DelPrete$GM)
+
+rankcor(DelPrete$Index_bispinous, DelPrete$GM)
+```
+
+```{r}
+Del.response <- list(AP.Inlet = DelPrete$Index_AP_inlet, AP.Outlet = DelPrete$Index_AP_outlet, Bispinous = DelPrete$Index_bispinous, Pelvic.Breadth = DelPrete$Index_pelvic_breadth, TD.Outlet = DelPrete$Index_TD_outlet)
+
+Del.pred <- list(GM = DelPrete$GM, Femur.Head.Adj = DelPrete$femur_head_adjusted_1.715)
+length(Del.response)
+Del.response[[5]]
+Del.response[5]
+
+
+```
+
+# 4 07 2020
+
+```{r}
+smooth.spline(DelPrete$GM, DelPrete$Index_AP_inlet)
+
+plot(DelPrete$GM, DelPrete$Index_AP_inlet, xlab = "GM", ylab = "AP Inlet")
+lines(smooth.spline(DelPrete$GM, DelPrete$Index_AP_inlet), col = "blue")
+
+```
+
+```{r}
+smooth.spline(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet)
+
+plot(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet, xlab = "Femur Head Adjusted", ylab = "AP Inlet")
+lines(smooth.spline(DelPrete$femur_head_adjusted_1.715, DelPrete$Index_AP_inlet), col = "blue")
+
+```
+
+
+
+```{r}
+library(mgcv)
+```
+## AP Inlet
+
+### GM
+
+```{r}
+?plot
+AP.GM <-gam(Index_AP_inlet ~ s(GM), data = DelPrete)
+
+plot(AP.GM, residuals = TRUE)
+summary(AP.GM)
+gam.check(AP.GM)
+cor.test(DelPrete$Index_AP_inlet, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+AP.Femur <-gam(Index_AP_inlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(AP.Femur, residuals = TRUE)
+summary(AP.Femur)
+gam.check(AP.Femur)
+cor.test(DelPrete$Index_AP_inlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## TD Outlet
+
+### GM
+
+```{r}
+
+TD.OUT.GM <-gam(Index_TD_outlet ~ s(GM), data = DelPrete)
+
+plot(TD.OUT.GM, residuals = TRUE)
+summary(TD.OUT.GM)
+gam.check(TD.OUT.GM)
+cor.test(DelPrete$Index_TD_outlet, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+TD.OUT.Femur <-gam(Index_TD_outlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(TD.OUT.Femur, residuals = TRUE)
+summary(TD.OUT.Femur)
+gam.check(TD.OUT.Femur)
+cor.test(DelPrete$Index_TD_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## AP Outlet
+
+### GM
+
+```{r}
+
+AP.OUT.GM <-gam(Index_AP_outlet ~ s(GM), data = DelPrete)
+
+plot(AP.OUT.GM, residuals = TRUE)
+summary(AP.OUT.GM)
+gam.check(AP.OUT.GM)
+cor.test(DelPrete$Index_AP_outlet, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+AP.OUT.Femur <-gam(Index_AP_outlet ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(AP.OUT.Femur, residuals = TRUE)
+summary(AP.OUT.Femur)
+gam.check(AP.OUT.Femur)
+cor.test(DelPrete$Index_AP_outlet, DelPrete$femur_head_adjusted_1.715)
+```
+
+## Bispinous
+
+### GM
+
+```{r}
+
+Bispi.GM <-gam(Index_bispinous ~ s(GM), data = DelPrete)
+
+plot(Bispi.GM, residuals = TRUE)
+summary(Bispi.GM)
+gam.check(Bispi.GM)
+cor.test(DelPrete$Index_bispinous, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+Bispi.Femur <-gam(Index_bispinous ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(Bispi.Femur, residuals = TRUE)
+summary(Bispi.Femur)
+gam.check(Bispi.Femur)
+cor.test(DelPrete$Index_bispinous, DelPrete$femur_head_adjusted_1.715)
+```
+
+
+## Pelvic Breadth
+
+### GM
+
+```{r}
+
+PB.GM <-gam(Index_pelvic_breadth ~ s(GM), data = DelPrete)
+
+plot(PB.GM, residuals = TRUE)
+summary(PB.GM)
+gam.check(PB.GM)
+cor.test(DelPrete$Index_pelvic_breadth, DelPrete$GM)
+```
+
+### Femur Head Adj
+
+```{r}
+PB.Femur <-gam(Index_pelvic_breadth ~ s(femur_head_adjusted_1.715), data = DelPrete)
+
+plot(PB.Femur, residuals = TRUE)
+summary(PB.Femur)
+gam.check(PB.Femur)
+cor.test(DelPrete$Index_pelvic_breadth, DelPrete$femur_head_adjusted_1.715)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+AP.GM.T <-gam(Index_AP_inlet ~ s(GM), data = DelPreteT)
+
+plot(AP.GM.T, residuals = TRUE)
+summary(AP.GM.T)
+gam.check(AP.GM.T)
+cor.test(DelPreteT$Index_AP_inlet, DelPreteT$GM)
+```
+
+```{r}
+DelPreteC <- sorting.collections.all(2)
+```
+
+```{r}
+
+AP.GM.C <-gam(Index_AP_inlet ~ s(GM), data = DelPreteC)
+
+plot(AP.GM.C, residuals = TRUE)
+summary(AP.GM.C)
+gam.check(AP.GM.C)
+cor.test(DelPreteC$Index_AP_inlet, DelPreteC$GM)
+```
+
+
+
+
+```{r}
+
+TD.GM <-gam(Index_TD_outlet ~ s(GM), data = DelPrete)
+
+plot(AP.GM.T, residuals = TRUE)
+summary(AP.GM.T)
+gam.check(AP.GM.T)
+cor.test(DelPreteT$Index_AP_inlet, DelPreteT$GM)
+```
+
+
+
+```{r}
+cor.all <- function(x,y) {
+  nlc <- vector()
+  c <- vector()
+  Cor.list <- list(nlc, c)
+  for (k in 1:length(y)) {
+  for (i in 1:length(x)){
+    Cor.list$nlc[i] <- c(nlCor(x[[i]],y[[k]], method = "log"), nlCor(x[[i]],y[[k]], method="poly"), nlCor(x[[i]],y[[k]], method = "expo"))
+    Cor.list$c[i] <- cor(x[[i]],y[[k]])
+  }
+  }
+  return(Cor.list)
+}
+
+
+```
+
+```{r}
+names(Del.response)
+names(Del.pred)
+```
+
+
+
+```{r}
+descrip.Del <- function(resp,pred){
+  
+  favstats.names <- list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n", "CV")
+  descrip.array <- array(dim = c(length(resp),length(favstats.names)), dimnames = list(names(resp),list("min", "Q1", "median", "Q3", "max", "mean", "sd", "n", "CV")))
+  for (i in 1:length(resp)){
+
+    descrip.array[i,1] <- favstats(resp[[i]])$min
+    descrip.array[i,2] <- favstats(resp[[i]])$Q1
+    descrip.array[i,3] <- favstats(resp[[i]])$median
+    descrip.array[i,4] <- favstats(resp[[i]])$Q3
+    descrip.array[i,5] <- favstats(resp[[i]])$max
+    descrip.array[i,6] <- favstats(resp[[i]])$mean
+    descrip.array[i,7] <- favstats(resp[[i]])$sd
+    descrip.array[i,8] <- favstats(resp[[i]])$n
+    descrip.array[i,9] <- favstats(resp[[i]])$sd/favstats(resp[[i]])$mean
+  
+     hist(resp[[i]], xlab = names(resp[i]))
+  }
+  return(descrip.array)
+}
+```
+
+
+
+```{r}
+cor.all.lin <- function(resp,pred) {
+  cor.array <- array(dim = c(length(resp),length(pred)), dimnames = list(names(resp),names(pred)))
+  for (i in 1:length(resp)){
+  for (k in 1:length(pred)){
+    cor.array[i,k] <- cor(resp[[i]],pred[[k]])
+    plot(resp[[i]], pred[[k]], xlab = names(resp[i]))
+  }
+  }
+  
+  return(cor.array)
+}
+```
+
+```{r}
+cor.all.lin(Del.response, Del.pred)
+
+```
+
+## Raw data
+
+```{r}
+DelPrete.orig <- DelpreteOriginalData
+
+TE <- seq(from =4, to=4, length.out=208)
+HT <- seq(from =3, to=3, length.out=240)
+C <- seq(from =2, to=2, length.out =155)
+S <- seq(from =1, to=1, length.out=68)
+
+Collection <- c(TE,C,S,HT)
+DelPrete.orig$Collection <- Collection
+
+for (i in 1:length(DelPrete.orig$Collection)) {
+  if (DelPrete.orig$Collection[i] == 1){
+    DelPrete.orig$Location[i] <- "S"
+  }else if (DelPrete.orig$Collection[i] == 2){
+    DelPrete.orig$Location[i] <- "C"
+  }else if (DelPrete.orig$Collection[i] == 3){
+    DelPrete.orig$Location[i] <- "HT"
+  }else if (DelPrete.orig$Collection[i] == 4){
+    DelPrete.orig$Location[i] <- "T"
+  }
+}
+
+DelPrete.orig <- subset(DelPrete.orig, `femur head diameter` != "NA")
+
+
+for (i in 1:length(DelPrete.orig$Gender)) {
+  if (DelPrete.orig$Gender[i] == "male" || DelPrete.orig$Gender[i] == "Male"){
+    DelPrete.orig$Gender[i] <- "M"
+  } else if (DelPrete.orig$Gender[i] == "female" || DelPrete.orig$Gender[i] == "Female"){
+    
+    DelPrete.orig$Gender[i] <- "F"
+  }
+  
+}
+for (i in 1:length(DelPrete.orig$Ethnicity)) {
+  if (DelPrete.orig$Ethnicity[i] == "white" || DelPrete.orig$Ethnicity[i] == "white"){
+    DelPrete.orig$Ethnicity[i] <- "W"
+  } else if (DelPrete.orig$Ethnicity[i] == "black" || DelPrete.orig$Ethnicity[i] == "Black") {
+    DelPrete.orig$Ethnicity[i] <- "B"
+  }
+  
+}
+
+
+View(DelPrete.orig)
+```
+
+```{r}
+DelPrete.orig.F <- subset(DelPrete.orig, Gender == "F")
+DelPrete.orig.M <- subset(DelPrete.orig, Gender == "M")
+
+View(DelPrete.orig.F)
+View(DelPrete.orig.M)
+```
+
+### Descriptives
+
+```{r}
+Del.orig.resp <- list(AP.Inlet = DelPrete.orig$`Anteroposterior diameter of the inlet`, AP.Outlet = DelPrete.orig$`Anterioposterior space of outlet adj`, Bispinous = DelPrete.orig$`Bi-spinous diameter`, Pelvic.Breadth = DelPrete.orig$`Pelvic breadth`, TD.Outlet = DelPrete.orig$`Transverse diameter of the outlet`)
+
+DelPrete.orig$Femur.Head.Adj <- DelPrete.orig$`femur head diameter`^1.715
+
+Del.orig.pred <- list(Femur.Head.Adj = DelPrete.orig$Femur.Head.Adj)
+
+Del.orig.resp.F <- list(AP.Inlet = DelPrete.orig.F$`Anteroposterior diameter of the inlet`, AP.Outlet = DelPrete.orig.F$`Anterioposterior space of outlet adj`, Bispinous = DelPrete.orig.F$`Bi-spinous diameter`, Pelvic.Breadth = DelPrete.orig.F$`Pelvic breadth`, TD.Outlet = DelPrete.orig.F$`Transverse diameter of the outlet`)
+
+DelPrete.orig.F$Femur.Head.Adj <- DelPrete.orig.F$`femur head diameter`^1.715
+
+Del.orig.pred <- list(Femur.Head.Adj = DelPrete.orig.F$Femur.Head.Adj)
+```
+
+```{r}
+
+descrip.Del(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
+```
+
+
+### ANOVA
+
+```{r}
+cor.test(DelPrete.orig$`Anteroposterior diameter of the inlet`, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+
+model<-glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model, test="F"
+               )
+results
+
+
+```
+
+The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+
+```{r}
+library(reshape2)
+library(broom)
+
+?TukeyHSD
+model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
+as.data.frame(tidy(model.Tuk)) %>%
+    filter(adj.p.value < .05)
+model.Tuk
+```
+
+```{r}
+cor.test(DelPrete.orig$`Pelvic breadth`, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+
+model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model, test="F"
+               )
+results
+
+
+```
+
+The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+
+```{r}
+library(reshape2)
+library(broom)
+model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
+as.data.frame(tidy(model.Tuk)) %>%
+    filter(adj.p.value < .05)
+model.Tuk
+```
+
+### MANOVA
+
+```{r}
+
+
+results<-manova(cbind(DelPrete.orig$`Anteroposterior diameter of the inlet`,  DelPrete.orig$`Pelvic breadth`, DelPrete.orig$`Anterioposterior space of outlet adj`, DelPrete.orig$`Bi-spinous diameter`, DelPrete.orig$`Transverse diameter of the outlet`) ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+summary.aov(results)
+
+
+```
+
+```{r}
+?Manova
+
+
+
+model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+
+results<-Manova(model, test.statistic="F"
+               )
+results
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
