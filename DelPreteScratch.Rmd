@@ -4,9 +4,12 @@ output: html_notebook
 ---
 
 
+
+
 ```{r}
 library(mosaic)
 library(car)
+library(multcomp)
 ```
 
 
@@ -657,6 +660,7 @@ S <- seq(from =1, to=1, length.out=68)
 
 Collection <- c(TE,C,S,HT)
 DelPrete.orig$Collection <- Collection
+DelPrete.orig$Location <- DelPrete.orig$Collection
 
 for (i in 1:length(DelPrete.orig$Collection)) {
   if (DelPrete.orig$Collection[i] == 1){
@@ -669,6 +673,11 @@ for (i in 1:length(DelPrete.orig$Collection)) {
     DelPrete.orig$Location[i] <- "T"
   }
 }
+
+
+DelPrete.orig$LocationR <- DelPrete.orig$Location
+
+
 
 DelPrete.orig <- subset(DelPrete.orig, `femur head diameter` != "NA")
 
@@ -691,9 +700,31 @@ for (i in 1:length(DelPrete.orig$Ethnicity)) {
   
 }
 
+for (i in 1:length(DelPrete.orig$Location)) {
+  if (DelPrete.orig$Location[i] == "S" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "SW"
+  }else if (DelPrete.orig$Location[i] == "T" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "TW"
+  }else if (DelPrete.orig$Location[i] == "T" && DelPrete.orig$Ethnicity[i] == "B" ){
+    DelPrete.orig$LocationR[i] <- "TB"
+  }else if (DelPrete.orig$Location[i] == "HT" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "HTW"
+  }else if (DelPrete.orig$Location[i] == "HT" && DelPrete.orig$Ethnicity[i] == "B" ){
+    DelPrete.orig$LocationR[i] <- "HTB"
+  }else if (DelPrete.orig$Location[i] == "C" && DelPrete.orig$Ethnicity[i] == "W" ){
+    DelPrete.orig$LocationR[i] <- "CW"
+  }
+}
 
 View(DelPrete.orig)
 ```
+
+```{r}
+DelPrete.orig$Gender <- as.factor(DelPrete.orig$Gender)
+DelPrete.orig$LocationR <- as.factor(DelPrete.orig$LocationR)
+str(DelPrete.orig)
+```
+
 
 ```{r}
 DelPrete.orig.F <- subset(DelPrete.orig, Gender == "F")
@@ -725,81 +756,213 @@ descrip.Del(resp = Del.orig.resp.F, pred = Del.orig.pred.F)
 ```
 
 
-### ANOVA
+
+
+### Renaming
 
 ```{r}
-cor.test(DelPrete.orig$`Anteroposterior diameter of the inlet`, DelPrete.orig$Femur.Head.Adj)
+DelPrete.orig$APInlet <- DelPrete.orig$`Anteroposterior diameter of the inlet`
+DelPrete.orig$PelvicBreadth <- DelPrete.orig$`Pelvic breadth`
+DelPrete.orig$Bispinous <- DelPrete.orig$`Bi-spinous diameter`
+DelPrete.orig$TDOutlet <- DelPrete.orig$`Transverse diameter of the outlet`
+DelPrete.orig$APOutlet <- DelPrete.orig$`Anterioposterior space of outlet adj`
 ```
 
+
+
+```{r}
+hist(DelPrete.orig$APInlet, xlab = "AP Inlet", main = "AP Inlet", col = "gray")
+hist(DelPrete.orig$Bispinous, xlab = "Bispinous", main = "Bispinous", col = "tan")
+hist(DelPrete.orig$TDOutlet, xlab = "TD Outlet", main = "TD Outlet", col = "navy")
+hist(DelPrete.orig$PelvicBreadth, xlab = "Pelvic Breadth", main = "Pelvic Breadth", col = "purple")
+hist(DelPrete.orig$APOutlet, xlab = "AP Outlet", main = "AP Outlet", col = "dark green")
+```
+
+
+### Bad ANOVA
+
 ```{r}
 
-model<-glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+model<-glm(DelPrete.orig$APInlet ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
 
-results<-Anova(model, test="F"
+results<-anova(model, test="F"
                )
 results
 
 
 ```
 
-The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+### ANCOVA
+
+#### AP INLET
 
 ```{r}
-library(reshape2)
-library(broom)
-
-?TukeyHSD
-model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Anteroposterior diameter of the inlet` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
-as.data.frame(tidy(model.Tuk)) %>%
-    filter(adj.p.value < .05)
-model.Tuk
+cor.test(DelPrete.orig$APInlet, DelPrete.orig$Femur.Head.Adj)
 ```
 
 ```{r}
-cor.test(DelPrete.orig$`Pelvic breadth`, DelPrete.orig$Femur.Head.Adj)
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.APInlet<-aov(APInlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.APInlet, type="III")
 ```
 
 ```{r}
+summary.lm(model.APInlet)
+```
 
-model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+```{r}
+postHocs<-glht(model.APInlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
 
-results<-Anova(model, test="F"
+```{r}
+confint(postHocs)
+```
+
+#### AP OUTLET
+
+```{r}
+cor.test(DelPrete.orig$APOutlet, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.APOutlet<-aov(APOutlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.APOutlet, type="III")
+```
+
+```{r}
+summary.lm(model.APOutlet)
+```
+
+```{r}
+postHocs<-glht(model.APOutlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+#### Bispinous
+
+```{r}
+cor.test(DelPrete.orig$Bispinous, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.Bispinous<-aov(Bispinous ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.Bispinous, type="III")
+```
+
+```{r}
+summary.lm(model.Bispinous)
+```
+
+```{r}
+postHocs<-glht(model.Bispinous, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+#### TD OUTLET
+
+```{r}
+cor.test(DelPrete.orig$TDOutlet, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.TDOutlet<-aov(TDOutlet ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.TDOutlet, type="III")
+```
+
+```{r}
+summary.lm(model.APOutlet)
+```
+
+```{r}
+postHocs<-glht(model.APOutlet, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+#### TD OUTLET
+
+```{r}
+cor.test(DelPrete.orig$PelvicBreadth, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+contrasts(DelPrete.orig$LocationR)<-cbind(c(-5,1,1,1,1,1), c(0,-4,1,1,1,1),c(0,0,-3,1,1,1), c(0,0,0,-2,1,1), c(0,0,0,0,-1,1))
+model.PelvicBreadth<-aov(PelvicBreadth ~ Gender*LocationR + Femur.Head.Adj, data = DelPrete.orig)
+Anova(model.PelvicBreadth, type="III")
+```
+
+```{r}
+summary.lm(model.PelvicBreadth)
+```
+
+```{r}
+postHocs<-glht(model.PelvicBreadth, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+model.APInlet<-aov(DelPrete.orig$APInlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model.APInlet, test="F"
                )
 results
 
 
 ```
 
-The ANCOVA test shows that there are statistical differences between the genders of the pelvic bones, the location of the pelvic bones, and the genders and locations combined.
+
 
 ```{r}
-library(reshape2)
-library(broom)
-model.Tuk<-TukeyHSD(glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location))
-as.data.frame(tidy(model.Tuk)) %>%
-    filter(adj.p.value < .05)
-model.Tuk
-```
-
-### MANOVA
-
-```{r}
-
-
-results<-manova(cbind(DelPrete.orig$`Anteroposterior diameter of the inlet`,  DelPrete.orig$`Pelvic breadth`, DelPrete.orig$`Anterioposterior space of outlet adj`, DelPrete.orig$`Bi-spinous diameter`, DelPrete.orig$`Transverse diameter of the outlet`) ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
-summary.aov(results)
-
-
+postHocs <- glht(model = model.APInlet)
+summary(postHocs)
 ```
 
 ```{r}
-?Manova
+confint(postHocs)
+```
 
+```{r}
+cor.test(DelPrete.orig$APOutlet, DelPrete.orig$Femur.Head.Adj)
+```
 
+```{r}
 
-model<-glm(DelPrete.orig$`Pelvic breadth` ~ DelPrete.orig$Gender * DelPrete.orig$Location + DelPrete.orig$Femur.Head.Adj)
+model.APOutlet<-aov(DelPrete.orig$APOutlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
 
-results<-Manova(model, test.statistic="F"
+results<-Anova(model.APOutlet, test="F"
                )
 results
 
@@ -808,14 +971,111 @@ results
 
 
 
+```{r}
+postHocs <- glht(model = model.APOutlet)
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+```{r}
+cor.test(DelPrete.orig$Bispinous, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+
+model.Bispinous<-aov(DelPrete.orig$Bispinous ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model.Bispinous, test="F"
+               )
+results
+
+
+```
 
 
 
+```{r}
+postHocs <- glht(model = model.Bispinous)
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+```{r}
+
+cor.test(DelPrete.orig$TDOutlet, DelPrete.orig$Femur.Head.Adj)
+
+```
+
+
+```{r}
+
+model.TDOutlet<-aov(DelPrete.orig$TDOutlet ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model.TDOutlet, test="F"
+               )
+results
+
+
+```
 
 
 
+```{r}
+postHocs <- glht(model = model.TDOutlet)
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+```{r}
+cor.test(DelPrete.orig$PelvicBreadth, DelPrete.orig$Femur.Head.Adj)
+```
+
+```{r}
+
+model.PelvicBreadth<-aov(DelPrete.orig$PelvicBreadth ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
+
+results<-Anova(model.PelvicBreadth, test="F"
+               )
+results
 
 
+```
 
+```{r}
 
+model.PelvicBreadth<-aov(PelvicBreadth ~ Gender * LocationR + Femur.Head.Adj, data = DelPrete.orig)
+
+results<-Anova(model.PelvicBreadth, test="F"
+               )
+results
+
+summary.lm(model.PelvicBreadth)
+
+```
+
+```{r}
+postHocs <- glht(model = model.PelvicBreadth, linfct = mcp(LocationR = "Tukey"))
+summary(postHocs)
+```
+
+```{r}
+confint(postHocs)
+```
+
+## MANCOVA
+
+```{r}
+
+mancova.model<-lm(cbind(DelPrete.orig$APInlet,  DelPrete.orig$PelvicBreadth, DelPrete.orig$APOutlet, DelPrete.orig$Bispinous, DelPrete.orig$TDOutlet) ~ DelPrete.orig$Gender * DelPrete.orig$LocationR + DelPrete.orig$Femur.Head.Adj)
+Manova(mancova.model, )
+```
 
